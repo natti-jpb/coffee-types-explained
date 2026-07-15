@@ -96,6 +96,7 @@
     border-radius: 24px;
     padding: 16px 14px 22px;
     position: relative;
+    cursor: pointer;
     transition: transform .6s cubic-bezier(.22, 1, .36, 1),
                 box-shadow .6s cubic-bezier(.22, 1, .36, 1),
                 opacity .5s ease, filter .5s ease;
@@ -133,12 +134,18 @@
   }
   .card:is(:hover, :focus-visible, .broken)::after { opacity: 1; }
 
-  .cupbox { position: relative; perspective: 900px; }
+  .cupbox {
+    position: relative;
+    perspective: 900px;
+    transform: translateX(14.9%);
+    transition: transform .65s cubic-bezier(.22, 1, .36, 1);
+  }
+  .card:is(:hover, :focus-visible, .broken) .cupbox { transform: translateX(0); }
   .cupbox::before {
     content: "";
     position: absolute;
     top: 52%;
-    left: 50%;
+    left: 35%;
     width: 72%;
     aspect-ratio: 1;
     transform: translate(-50%, -50%);
@@ -287,6 +294,121 @@
     font-size: 12px;
     color: #a98a6f;
   }
+
+  /* ---- recipe modal ---- */
+  .mwrap {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .mwrap[hidden] { display: none; }
+  .mback {
+    position: absolute;
+    inset: 0;
+    background: rgba(40, 22, 10, .45);
+    backdrop-filter: blur(3px);
+    animation: mfade .3s ease both;
+  }
+  @keyframes mfade { from { opacity: 0; } }
+  .modal {
+    position: relative;
+    background: linear-gradient(175deg, #FFFDF7, #F8EFDF);
+    border: 1px solid rgba(62, 36, 21, .1);
+    border-radius: 26px;
+    padding: 30px 34px 34px;
+    max-width: 580px;
+    width: 100%;
+    max-height: 86vh;
+    overflow: auto;
+    box-shadow: 0 50px 100px -30px rgba(42, 24, 12, .55);
+    animation: mpop .45s cubic-bezier(.22, 1, .36, 1) both;
+  }
+  @keyframes mpop { from { opacity: 0; transform: translateY(28px) scale(.96); } }
+  .mclose {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    padding: 6px 10px;
+    color: #a98660;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .mclose:hover { color: #3E2415; }
+  .mhead { display: flex; gap: 20px; align-items: center; }
+  .mcup { width: 118px; flex: none; }
+  .mcup svg { display: block; width: 100%; overflow: visible; }
+  .msub { font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #A5764C; }
+  #mTitle {
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.05;
+    margin: 5px 0 8px;
+  }
+  .mhead .traits { justify-content: flex-start; margin-top: 6px; }
+  .mlbl {
+    font: 600 10.5px Inter, sans-serif;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: #A5764C;
+    margin: 20px 0 10px;
+  }
+  .ming { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ming li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255, 253, 247, .9);
+    border: 1px solid rgba(62, 36, 21, .12);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #5c4030;
+  }
+  .ming .sw { width: 11px; height: 11px; border-radius: 4px; }
+  .ming em { font-style: normal; color: #A5764C; font-weight: 600; }
+  .msteps {
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .msteps li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #5c4030;
+  }
+  .msteps li::before {
+    content: counter(step, decimal-leading-zero);
+    font: 600 11px Inter, sans-serif;
+    color: #A5764C;
+    border: 1px solid rgba(165, 118, 76, .4);
+    border-radius: 999px;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  @media (max-width: 560px) {
+    .mhead { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .modal { padding: 26px 22px 28px; }
+  }
   footer a { color: #8a6a4f; text-decoration: none; border-bottom: 1px solid rgba(138,106,79,.35); }
   footer a:hover { color: #3E2415; }
 
@@ -385,6 +507,25 @@
 
 <footer><span id="footer"></span> · <a href="https://github.com/natti-jpb/coffee-types-explained" target="_blank" rel="noopener">GitHub ↗</a></footer>
 
+<div class="mwrap" id="mwrap" hidden>
+  <div class="mback" id="mback"></div>
+  <article class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="mclose" id="mclose" aria-label="close">×</button>
+    <div class="mhead">
+      <div class="mcup" id="mcup"></div>
+      <div>
+        <p class="msub" id="mSub"></p>
+        <h2 id="mTitle"></h2>
+        <div id="mTraits"></div>
+      </div>
+    </div>
+    <h3 class="mlbl" id="mIngLbl"></h3>
+    <ul class="ming" id="mIng"></ul>
+    <h3 class="mlbl" id="mStepLbl"></h3>
+    <ol class="msteps" id="mSteps"></ol>
+  </article>
+</div>
+
 <script>
 /* ================= i18n ================= */
 const UI = {
@@ -393,8 +534,8 @@ const UI = {
     brand: "coffee types",
     eyebrow: "a visual guide",
     title: "Coffee, from the inside",
-    lead: "Hover over a cup to break it into its layers.",
-    leadTouch: "Tap a cup to break it into its layers.",
+    lead: "Hover to break a cup apart — click it for the full recipe.",
+    leadTouch: "Tap to break a cup apart — tap again for the recipe.",
     footer: "Approximate proportions — every barista has their own.",
   },
   pt: {
@@ -402,8 +543,8 @@ const UI = {
     brand: "tipos de café",
     eyebrow: "guia visual",
     title: "Os cafés, por dentro",
-    lead: "Passe o mouse sobre uma xícara para abrir as camadas.",
-    leadTouch: "Toque numa xícara para abrir as camadas.",
+    lead: "Passe o mouse para abrir as camadas — clique para ver a receita.",
+    leadTouch: "Toque para abrir as camadas — toque de novo para a receita.",
     footer: "Proporções aproximadas — cada barista tem a sua.",
   },
   de: {
@@ -411,8 +552,8 @@ const UI = {
     brand: "kaffeesorten",
     eyebrow: "ein visueller Leitfaden",
     title: "Kaffee, von innen",
-    lead: "Fahre mit der Maus über eine Tasse, um die Schichten zu öffnen.",
-    leadTouch: "Tippe auf eine Tasse, um die Schichten zu öffnen.",
+    lead: "Mit der Maus die Schichten öffnen — Klick für das Rezept.",
+    leadTouch: "Antippen für die Schichten — nochmal für das Rezept.",
     footer: "Ungefähre Proportionen — jeder Barista hat seine eigenen.",
   },
 };
@@ -604,6 +745,95 @@ const CAFES = [
     ],
   },
 ];
+
+/* ================= recipes (step by step) ================= */
+const STEPS = {
+  espresso: {
+    en: ["Grind 18 g of beans to a fine, table-salt texture.", "Distribute and tamp evenly in the portafilter.", "Lock in and extract for 25–30 seconds at 9 bars.", "Aim for 30 ml with a golden, unbroken crema.", "Serve immediately in a warm demitasse."],
+    pt: ["Moa 18 g de grãos em textura fina, como sal de mesa.", "Distribua e compacte o pó uniformemente no porta-filtro.", "Encaixe e extraia por 25–30 segundos a 9 bars.", "Busque 30 ml com uma crema dourada e contínua.", "Sirva imediatamente numa demitasse pré-aquecida."],
+    de: ["18 g Bohnen fein mahlen, etwa wie Tafelsalz.", "Gleichmäßig im Siebträger verteilen und tampen.", "Einspannen und 25–30 Sekunden bei 9 Bar extrahieren.", "Ziel: 30 ml mit goldener, geschlossener Crema.", "Sofort in einer vorgewärmten Espressotasse servieren."],
+  },
+  macchiato: {
+    en: ["Pull a single espresso into a small glass.", "Steam a splash of milk into stiff foam.", "Spoon a dollop of foam on top — the “stain”.", "Serve right away, no stirring."],
+    pt: ["Extraia um espresso num copinho.", "Vaporize um pouco de leite até formar espuma firme.", "Coloque uma colherada de espuma por cima — a “mancha”.", "Sirva na hora, sem mexer."],
+    de: ["Einen Espresso in ein kleines Glas ziehen.", "Einen Schuss Milch zu festem Schaum aufschäumen.", "Einen Löffel Schaum daraufsetzen — der „Fleck“.", "Sofort servieren, nicht umrühren."],
+  },
+  cortado: {
+    en: ["Pull a double espresso into a gibraltar glass.", "Steam an equal amount of milk with very light foam.", "Pour the milk slowly to keep the layers visible.", "Serve warm — balance is the whole point."],
+    pt: ["Extraia um espresso duplo num copo gibraltar.", "Vaporize a mesma quantidade de leite com pouquíssima espuma.", "Despeje o leite devagar para manter as camadas visíveis.", "Sirva morno — o equilíbrio é o ponto."],
+    de: ["Doppelten Espresso in ein Gibraltar-Glas ziehen.", "Gleich viel Milch mit ganz wenig Schaum dämpfen.", "Milch langsam eingießen, damit die Schichten bleiben.", "Warm servieren — Balance ist alles."],
+  },
+  bombon: {
+    en: ["Pour 50 ml of condensed milk into a small glass.", "Pull a fresh espresso.", "Pour it slowly over the back of a spoon so it floats.", "Serve with a spoon — stir just before drinking."],
+    pt: ["Coloque 50 ml de leite condensado num copinho.", "Extraia um espresso fresco.", "Despeje devagar sobre as costas de uma colher para flutuar.", "Sirva com colher — misture só na hora de beber."],
+    de: ["50 ml Kondensmilch in ein kleines Glas geben.", "Einen frischen Espresso ziehen.", "Langsam über einen Löffelrücken gießen, damit er schwimmt.", "Mit Löffel servieren — erst vor dem Trinken umrühren."],
+  },
+  flatwhite: {
+    en: ["Pull a double ristretto or espresso into a tulip cup.", "Steam milk to 55–60 °C with barely-there microfoam.", "Pour from low height with a steady swirl.", "Finish with a thin veil of microfoam — under 5 mm.", "Latte art optional, silky texture mandatory."],
+    pt: ["Extraia um ristretto duplo (ou espresso) numa xícara tulipa.", "Vaporize o leite a 55–60 °C com microespuma finíssima.", "Despeje de baixa altura, com giro constante.", "Finalize com um véu de microespuma — menos de 5 mm.", "Latte art é opcional; textura de veludo, obrigatória."],
+    de: ["Doppelten Ristretto oder Espresso in eine Tulpentasse ziehen.", "Milch auf 55–60 °C mit hauchfeinem Mikroschaum dämpfen.", "Aus geringer Höhe mit gleichmäßigem Schwung eingießen.", "Mit einem Hauch Mikroschaum abschließen — unter 5 mm.", "Latte Art optional, samtige Textur Pflicht."],
+  },
+  cappuccino: {
+    en: ["Pull an espresso into a 180 ml cup.", "Steam milk, folding in air for a rich foam.", "Pour: one third coffee, one third milk, one third foam.", "Dust with cocoa if you like it sweet-scented.", "Serve hot — the foam keeps it warm."],
+    pt: ["Extraia um espresso numa xícara de 180 ml.", "Vaporize o leite incorporando ar para uma espuma rica.", "Monte: um terço café, um terço leite, um terço espuma.", "Polvilhe cacau se gostar do aroma adocicado.", "Sirva quente — a espuma segura a temperatura."],
+    de: ["Espresso in eine 180-ml-Tasse ziehen.", "Milch mit viel Luft zu üppigem Schaum aufschäumen.", "Schichten: je ein Drittel Kaffee, Milch und Schaum.", "Nach Belieben mit Kakao bestäuben.", "Heiß servieren — der Schaum hält warm."],
+  },
+  latte: {
+    en: ["Pull an espresso into a tall glass.", "Steam plenty of milk with light microfoam.", "Pour slowly so the milk wraps the coffee.", "Crown with a thin layer of foam — draw a heart if brave.", "Serve with a long spoon."],
+    pt: ["Extraia um espresso num copo alto.", "Vaporize bastante leite com microespuma leve.", "Despeje devagar para o leite envolver o café.", "Coroe com uma fina camada de espuma — desenhe um coração se ousar.", "Sirva com colher longa."],
+    de: ["Espresso in ein hohes Glas ziehen.", "Reichlich Milch mit leichtem Mikroschaum dämpfen.", "Langsam eingießen, sodass die Milch den Kaffee umhüllt.", "Mit feiner Schaumkrone abschließen — Herz optional.", "Mit langem Löffel servieren."],
+  },
+  mochaccino: {
+    en: ["Melt 25 ml of chocolate (or syrup) into the glass.", "Pull an espresso over the chocolate.", "Add steamed milk, pouring slowly for layers.", "Top with whipped cream and a chocolate drizzle.", "Serve with a spoon — it’s half dessert."],
+    pt: ["Derreta 25 ml de chocolate (ou calda) no copo.", "Extraia um espresso sobre o chocolate.", "Adicione leite vaporizado despejando devagar.", "Cubra com chantilly e um fio de chocolate.", "Sirva com colher — é meio sobremesa."],
+    de: ["25 ml Schokolade (oder Sirup) im Glas schmelzen.", "Espresso über die Schokolade ziehen.", "Heiße Milch langsam für Schichten eingießen.", "Mit Schlagsahne und Schokofäden toppen.", "Mit Löffel servieren — halb Dessert."],
+  },
+  einspaenner: {
+    en: ["Pull a double espresso into a handled glass.", "Lightly sweeten if you like — Vienna would.", "Whip cream to soft peaks, unsweetened.", "Float a generous cap of cream on top.", "Drink the hot coffee through the cool cream — don’t stir."],
+    pt: ["Extraia um espresso duplo num copo com asa.", "Adoce levemente se quiser — Viena adoçaria.", "Bata o creme de leite em picos suaves, sem açúcar.", "Flutue uma boa coroa de creme por cima.", "Beba o café quente através do creme frio — sem mexer."],
+    de: ["Doppelten Espresso in ein Henkelglas ziehen.", "Nach Wiener Art leicht süßen, wenn gewünscht.", "Sahne ohne Zucker cremig schlagen.", "Eine großzügige Haube obenauf setzen.", "Den heißen Kaffee durch die kühle Sahne trinken — nicht rühren."],
+  },
+  americano: {
+    en: ["Heat water to about 90 °C.", "Pour 90 ml of hot water into the mug first.", "Pull a fresh espresso.", "Pour the espresso over the water to keep the crema.", "Adjust strength with more or less water."],
+    pt: ["Aqueça água a cerca de 90 °C.", "Coloque 90 ml de água quente primeiro na caneca.", "Extraia um espresso fresco.", "Despeje o espresso sobre a água para preservar a crema.", "Ajuste a força com mais ou menos água."],
+    de: ["Wasser auf ca. 90 °C erhitzen.", "Zuerst 90 ml heißes Wasser in den Becher geben.", "Einen frischen Espresso ziehen.", "Espresso über das Wasser gießen — so bleibt die Crema.", "Stärke über die Wassermenge anpassen."],
+  },
+  irish: {
+    en: ["Warm the glass with hot water, then empty it.", "Add 40 ml of whiskey and a teaspoon of brown sugar.", "Top up with strong hot coffee and stir once.", "Lightly whip cream and pour it over a spoon to float.", "Sip the coffee through the cream — never stir again."],
+    pt: ["Aqueça o copo com água quente e esvazie.", "Adicione 40 ml de uísque e uma colher de açúcar mascavo.", "Complete com café forte e quente; mexa uma vez.", "Bata levemente o creme e despeje sobre uma colher para flutuar.", "Beba o café através do creme — nunca mexa de novo."],
+    de: ["Das Glas mit heißem Wasser vorwärmen, dann leeren.", "40 ml Whiskey und einen TL braunen Zucker hineingeben.", "Mit starkem, heißem Kaffee auffüllen; einmal umrühren.", "Sahne leicht schlagen und über einen Löffel aufgießen.", "Den Kaffee durch die Sahne trinken — nie wieder rühren."],
+  },
+  affogato: {
+    en: ["Chill a coupe or small bowl in the freezer.", "Add a generous scoop of vanilla ice cream.", "Pull a hot, fresh espresso.", "Pour it over the ice cream at the table.", "Eat immediately, while hot meets cold."],
+    pt: ["Gele uma taça no congelador.", "Adicione uma bola generosa de sorvete de baunilha.", "Extraia um espresso quente na hora.", "Despeje sobre o sorvete, de preferência à mesa.", "Coma imediatamente, enquanto o quente encontra o frio."],
+    de: ["Eine Schale im Gefrierfach vorkühlen.", "Eine großzügige Kugel Vanilleeis hineingeben.", "Einen heißen, frischen Espresso ziehen.", "Am Tisch über das Eis gießen.", "Sofort essen — solange heiß auf kalt trifft."],
+  },
+  icedlatte: {
+    en: ["Fill a tall glass with ice cubes.", "Pour in 180 ml of cold milk.", "Pull a double espresso.", "Pour it slowly over the back of a spoon to layer.", "Stir when you’re done admiring it."],
+    pt: ["Encha um copo alto com gelo.", "Adicione 180 ml de leite gelado.", "Extraia um espresso duplo.", "Despeje devagar sobre as costas de uma colher para criar camadas.", "Misture quando cansar de admirar."],
+    de: ["Ein hohes Glas mit Eiswürfeln füllen.", "180 ml kalte Milch eingießen.", "Einen doppelten Espresso ziehen.", "Langsam über einen Löffelrücken gießen — für Schichten.", "Umrühren, wenn man sich sattgesehen hat."],
+  },
+  dalgona: {
+    en: ["Mix 2 tbsp instant coffee, 2 tbsp sugar, 2 tbsp hot water.", "Whisk hard for 3–5 minutes until thick and glossy.", "Fill a glass with cold milk (ice optional).", "Spoon the whipped coffee on top in soft peaks.", "Stir before drinking — or eat the foam first."],
+    pt: ["Misture 2 colheres de café solúvel, 2 de açúcar e 2 de água quente.", "Bata firme por 3–5 minutos até ficar espesso e brilhante.", "Encha um copo com leite gelado (gelo opcional).", "Coloque o creme batido por cima, em picos suaves.", "Misture antes de beber — ou coma a espuma primeiro."],
+    de: ["Je 2 EL Instantkaffee, Zucker und heißes Wasser mischen.", "3–5 Minuten kräftig schlagen, bis es dick und glänzend ist.", "Ein Glas mit kalter Milch füllen (Eis optional).", "Die Kaffeecreme in weichen Spitzen daraufsetzen.", "Vor dem Trinken umrühren — oder erst den Schaum löffeln."],
+  },
+  espressotonic: {
+    en: ["Fill a highball glass with ice.", "Pour in 150 ml of chilled tonic water.", "Pull a double espresso and let it cool for 30 seconds.", "Pour it slowly over the tonic so it floats.", "Garnish with a lemon wheel. Don’t stir — sip through."],
+    pt: ["Encha um copo highball com gelo.", "Adicione 150 ml de água tônica gelada.", "Extraia um espresso duplo e espere 30 segundos.", "Despeje devagar sobre a tônica para flutuar.", "Decore com uma rodela de limão. Não misture."],
+    de: ["Ein Highball-Glas mit Eis füllen.", "150 ml gekühltes Tonic Water eingießen.", "Doppelten Espresso ziehen, 30 Sekunden abkühlen lassen.", "Langsam über das Tonic gießen, sodass er schwimmt.", "Mit Zitronenscheibe garnieren. Nicht umrühren."],
+  },
+  nitro: {
+    en: ["Steep coarse-ground coffee in cold water for 12–18 h.", "Strain into a keg or cream whipper and charge with nitrogen.", "Pour hard into a pint glass, no ice.", "Watch the cascade settle into a creamy head.", "Drink it black — nitro brings the sweetness."],
+    pt: ["Infunda café moído grosso em água fria por 12–18 h.", "Coe para um barril ou sifão e carregue com nitrogênio.", "Sirva com força num copo pint, sem gelo.", "Observe a cascata assentar num colarinho cremoso.", "Beba puro — o nitro traz a doçura."],
+    de: ["Grob gemahlenen Kaffee 12–18 h in kaltem Wasser ziehen lassen.", "In ein Fass oder einen Sahnesyphon füllen, mit Stickstoff laden.", "Kräftig in ein Pint-Glas zapfen, ohne Eis.", "Die Kaskade sich zu einer cremigen Krone setzen sehen.", "Schwarz trinken — Nitro bringt die Süße."],
+  },
+};
+
+const MOD = {
+  ing: { en: "ingredients", pt: "ingredientes", de: "Zutaten" },
+  how: { en: "how to make it", pt: "como preparar", de: "Zubereitung" },
+};
 
 /* ================= vessels ================= */
 const CX = 240;
@@ -1024,6 +1254,32 @@ function traitsHTML(c) {
   </div>`;
 }
 
+/* ================= recipe modal ================= */
+let lastFocus = null;
+function openModal(c) {
+  lastFocus = document.activeElement;
+  document.getElementById("mcup").innerHTML = cupSVG(c);
+  document.getElementById("mSub").textContent = c.sub[lang];
+  document.getElementById("mTitle").textContent = c.name;
+  document.getElementById("mTraits").innerHTML = traitsHTML(c);
+  document.getElementById("mIngLbl").textContent = MOD.ing[lang];
+  document.getElementById("mStepLbl").textContent = MOD.how[lang];
+  document.getElementById("mIng").innerHTML = [...c.layers].reverse().map((L) =>
+    `<li><span class="sw" style="background:${FILLS[L.i].c}"></span>${ING[L.i][lang]}<em>${qty(L.q)}</em></li>`).join("");
+  document.getElementById("mSteps").innerHTML =
+    ((STEPS[c.id] || {})[lang] || []).map((s) => `<li>${s}</li>`).join("");
+  document.getElementById("mwrap").hidden = false;
+  document.body.style.overflow = "hidden";
+  document.getElementById("mclose").focus();
+}
+function closeModal() {
+  const w = document.getElementById("mwrap");
+  if (w.hidden) return;
+  w.hidden = true;
+  document.body.style.overflow = "";
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
 /* ================= tilt & spotlight ================= */
 function attachTilt(card) {
   const tiltEl = card.querySelector(".cupbox svg");
@@ -1077,7 +1333,10 @@ function render() {
     const card = document.createElement("article");
     card.className = "card";
     card.style.setProperty("--i", i);
+    card.dataset.i = i;
     card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-haspopup", "dialog");
     card.setAttribute("aria-label", c.name);
     card.innerHTML =
       `<div class="cupbox">${cupSVG(c)}${labelsHTML(c)}</div>` +
@@ -1092,22 +1351,37 @@ function render() {
   });
 }
 
-/* touch: tap toggles the break-apart */
-if (touchMode) {
-  grid.addEventListener("click", (e) => {
-    const card = e.target.closest(".card");
-    if (!card) return;
-    const was = card.classList.contains("broken");
+/* click: desktop opens the recipe; touch breaks first, then opens */
+grid.addEventListener("click", (e) => {
+  const card = e.target.closest(".card");
+  if (!card) return;
+  const c = CAFES[+card.dataset.i];
+  if (touchMode && !card.classList.contains("broken")) {
     document.querySelectorAll(".card.broken").forEach((x) => x.classList.remove("broken"));
-    if (!was) card.classList.add("broken");
-  });
-}
+    card.classList.add("broken");
+    return;
+  }
+  openModal(c);
+});
+
+grid.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target.closest(".card");
+  if (!card) return;
+  e.preventDefault();
+  openModal(CAFES[+card.dataset.i]);
+});
+
+document.getElementById("mclose").addEventListener("click", closeModal);
+document.getElementById("mback").addEventListener("click", closeModal);
+window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
 $("langs").addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b || b.dataset.lang === lang) return;
   lang = b.dataset.lang;
   localStorage.setItem("coffee-lang", lang);
+  closeModal();
   render();
 });
 
