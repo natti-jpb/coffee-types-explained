@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nº 3 · Painéis — Tipos de Café</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+  body {
+    font-family: Inter, system-ui, sans-serif;
+    color: #F2E7D5;
+    background: #170E07;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 22px;
+    left: 26px;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .overlay .t {
+    font-size: 12px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: rgba(242, 231, 213, .9);
+  }
+  .overlay .s { font-size: 11px; color: rgba(242, 231, 213, .45); margin-top: 5px; }
+
+  .back {
+    position: fixed;
+    bottom: 22px;
+    left: 26px;
+    z-index: 20;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .back a { color: rgba(242, 231, 213, .55); text-decoration: none; margin-right: 14px; }
+  .back a:hover { color: #F2E7D5; }
+
+  .wrap { display: flex; height: 100dvh; }
+
+  .panel {
+    position: relative;
+    flex: 1 0 58px;
+    background: var(--bg);
+    border-right: 1px solid rgba(242, 231, 213, .07);
+    overflow: hidden;
+    cursor: pointer;
+    transition: flex .7s cubic-bezier(.3, 1, .3, 1);
+  }
+  .panel:last-child { border-right: none; }
+  .panel:hover { flex: 10; }
+
+  /* ---- collapsed spine ---- */
+  .mini {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 84px 0 34px;
+    transition: opacity .35s ease .12s;
+  }
+  .panel:hover .mini { opacity: 0; transition-delay: 0s; }
+  .mini .num { font-size: 10.5px; letter-spacing: .22em; color: rgba(242, 231, 213, .45); }
+  .mini .vname {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: Fraunces, Georgia, serif;
+    font-weight: 420;
+    font-size: 17px;
+    letter-spacing: .14em;
+    color: rgba(242, 231, 213, .88);
+  }
+  .chip {
+    width: 14px;
+    height: 66px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    outline: 1px solid rgba(242, 231, 213, .22);
+  }
+  .chip i { display: block; }
+
+  /* ---- expanded content ---- */
+  .full {
+    position: absolute;
+    inset: 0;
+    width: min(560px, 88vw);
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    padding: 0 24px 0 48px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  .panel:hover .full { opacity: 1; pointer-events: auto; transition-delay: .18s; }
+
+  .info { max-width: 252px; flex: none; }
+  .info .num2 { font-size: 11px; letter-spacing: .3em; color: rgba(242, 231, 213, .4); }
+  .info h2 {
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-weight: 380;
+    font-size: clamp(30px, 3.4vw, 46px);
+    line-height: 1.04;
+    margin: 10px 0 6px;
+  }
+  .info .sub {
+    font-size: 10.5px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: #D2A26B;
+  }
+  .info .desc {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: rgba(242, 231, 213, .72);
+    margin-top: 16px;
+  }
+  .recipe { list-style: none; margin-top: 22px; display: flex; flex-direction: column; gap: 9px; }
+  .recipe li { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: rgba(242, 231, 213, .82); }
+  .recipe .sw { width: 12px; height: 12px; border-radius: 3.5px; flex: none; outline: 1px solid rgba(242, 231, 213, .2); }
+  .recipe em { font-style: normal; margin-left: auto; color: #D2A26B; font-weight: 600; }
+
+  .bigcup { flex: 1; min-width: 0; display: flex; justify-content: center; }
+  .bigcup svg {
+    width: 100%;
+    max-width: 235px;
+    max-height: 64vh;
+    overflow: visible;
+    transform: scale(.92);
+    transition: transform .7s cubic-bezier(.25, 1, .35, 1);
+  }
+  .panel:hover .bigcup svg { transform: scale(1); }
+
+  .glass {
+    fill: none;
+    stroke: rgba(242, 231, 213, .9);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: opacity .5s .2s;
+  }
+  .panel:hover .glass { opacity: .22; }
+
+  .layer { transition: transform .65s cubic-bezier(.32, 1.32, .38, 1) calc(var(--k) * 70ms + .22s); }
+  .panel:hover .layer { transform: translate(var(--sx), calc(var(--k) * -24px)); }
+
+  /* ---- mobile: vertical accordion ---- */
+  @media (max-width: 760px) {
+    body { overflow: auto; }
+    .wrap { flex-direction: column; height: auto; min-height: 100dvh; }
+    .panel { flex: 1 0 64px; border-right: none; border-bottom: 1px solid rgba(242, 231, 213, .07); }
+    .panel:hover { flex: 8; }
+    .mini { flex-direction: row; padding: 0 22px; }
+    .mini .vname { writing-mode: horizontal-tb; transform: none; }
+    .chip { width: 70px; height: 14px; flex-direction: row; }
+    .full { width: 100%; padding: 22px; gap: 20px; }
+    .bigcup svg { max-height: 300px; }
+    .overlay, .back { mix-blend-mode: normal; }
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay">
+  <p class="t">Café, por dentro</p>
+  <p class="s">passe o mouse pelos painéis</p>
+</div>
+
+<div class="back">
+  <a href="index.html">← tipos de café</a>
+  <a href="variacao-1.html">Nº1</a>
+  <a href="variacao-2.html">Nº2</a>
+  <a href="variacao-3.html">Nº3</a>
+</div>
+
+<main class="wrap" id="wrap"></main>
+
+<script>
+const CAFES = [
+  {
+    id: "espresso", name: "Espresso", sub: "a base de tudo", bg: "#1A1008",
+    desc: "30 ml extraídos sob 9 bars de pressão. Intenso, encorpado, coroado por uma crema dourada.",
+    fill: 0.40,
+    layers: [
+      { n: "espresso", f: 0.80, c: "#3A2114", q: "30 ml" },
+      { n: "crema", f: 0.20, c: "#C98A4B", q: "topo" },
+    ],
+  },
+  {
+    id: "macchiato", name: "Macchiato", sub: "espresso manchado", bg: "#221509",
+    desc: "Um espresso “manchado” por uma colher de espuma de leite. O café continua no comando.",
+    fill: 0.48,
+    layers: [
+      { n: "espresso", f: 0.70, c: "#3A2114", q: "2/3" },
+      { n: "espuma de leite", f: 0.30, c: "#F6EDDE", q: "1/3" },
+    ],
+  },
+  {
+    id: "cortado", name: "Cortado", sub: "meio a meio", bg: "#2B1A0B",
+    desc: "Espresso cortado por partes iguais de leite vaporizado. Equilíbrio de origem espanhola.",
+    fill: 0.55,
+    layers: [
+      { n: "espresso", f: 0.50, c: "#3A2114", q: "1/2" },
+      { n: "leite vaporizado", f: 0.50, c: "#E9D8C1", q: "1/2" },
+    ],
+  },
+  {
+    id: "flatwhite", name: "Flat White", sub: "veludo australiano", bg: "#34210E",
+    desc: "Espresso duplo sob leite com microespuma finíssima. Textura aveludada, sabor presente.",
+    fill: 0.82,
+    layers: [
+      { n: "espresso", f: 0.34, c: "#3A2114", q: "1/3" },
+      { n: "leite vaporizado", f: 0.55, c: "#E9D8C1", q: "2/3" },
+      { n: "microespuma", f: 0.11, c: "#F6EDDE", q: "véu" },
+    ],
+  },
+  {
+    id: "cappuccino", name: "Cappuccino", sub: "a trindade italiana", bg: "#3E2812",
+    desc: "Um terço espresso, um terço leite, um terço espuma. O clássico italiano em proporção perfeita.",
+    fill: 0.90,
+    layers: [
+      { n: "espresso", f: 1 / 3, c: "#3A2114", q: "1/3" },
+      { n: "leite vaporizado", f: 1 / 3, c: "#E9D8C1", q: "1/3" },
+      { n: "espuma de leite", f: 1 / 3, c: "#F6EDDE", q: "1/3" },
+    ],
+  },
+  {
+    id: "latte", name: "Latte", sub: "abraço de leite", bg: "#4A3117",
+    desc: "Um espresso envolvido por muito leite vaporizado e uma fina coroa de espuma.",
+    fill: 0.95,
+    layers: [
+      { n: "espresso", f: 0.17, c: "#3A2114", q: "1/6" },
+      { n: "leite vaporizado", f: 0.66, c: "#E9D8C1", q: "4/6" },
+      { n: "espuma de leite", f: 0.17, c: "#F6EDDE", q: "1/6" },
+    ],
+  },
+  {
+    id: "mochaccino", name: "Mochaccino", sub: "café com chocolate", bg: "#3D2012",
+    desc: "Chocolate, espresso e leite vaporizado, coberto por chantilly. A ponte entre café e sobremesa.",
+    fill: 0.95,
+    layers: [
+      { n: "chocolate", f: 0.25, c: "#6B3A21", q: "1/4" },
+      { n: "espresso", f: 0.25, c: "#3A2114", q: "1/4" },
+      { n: "leite vaporizado", f: 0.40, c: "#E9D8C1", q: "2/4" },
+      { n: "chantilly", f: 0.10, c: "#FBF4E6", q: "topo" },
+    ],
+  },
+  {
+    id: "americano", name: "Americano", sub: "alongado e suave", bg: "#26170A",
+    desc: "Espresso alongado com água quente. Corpo de coado, alma de espresso.",
+    fill: 0.80,
+    layers: [
+      { n: "espresso", f: 1 / 3, c: "#3A2114", q: "1/3" },
+      { n: "água quente", f: 2 / 3, c: "#A5754F", q: "2/3", op: 0.88 },
+    ],
+  },
+];
+
+function cupSVG(c) {
+  const gx = 70, gw = 120, gy = 44, gb = 388;
+  const ix = gx + 5, iw = gw - 10, ib = gb - 5;
+  const ih = ib - (gy + 5);
+  const liquidH = c.fill * ih;
+  const last = c.layers.length - 1;
+  let cursor = ib;
+
+  const parts = c.layers.map((L, k) => {
+    const h = L.f * liquidH;
+    const y = cursor - h;
+    cursor = y;
+    const x = ix, w = iw;
+    const op = L.op ? ` fill-opacity="${L.op}"` : "";
+    const sx = (k % 2 === 0 ? 16 : -16) + "px";
+    let shape;
+    if (k === 0) {
+      const r = Math.min(11, h / 2);
+      shape = `<path d="M${x} ${y} H${x + w} V${y + h - r} Q${x + w} ${y + h} ${x + w - r} ${y + h} H${x + r} Q${x} ${y + h} ${x} ${y + h - r} Z" fill="${L.c}"${op}/>`;
+    } else if (k === last) {
+      const r = Math.min(5, h / 2);
+      shape = `<path d="M${x} ${y + r} Q${x} ${y} ${x + r} ${y} H${x + w - r} Q${x + w} ${y} ${x + w} ${y + r} V${y + h} H${x} Z" fill="${L.c}"${op}/>`;
+    } else {
+      shape = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${L.c}"${op}/>`;
+    }
+    return `<g class="layer" style="--k:${k};--sx:${sx}">${shape}</g>`;
+  }).join("");
+
+  return `<svg viewBox="0 0 260 420" role="img" aria-label="Camadas do ${c.name}">
+    ${parts}
+    <path class="glass" d="M${gx} ${gy} V${gb - 16} Q${gx} ${gb} ${gx + 16} ${gb} H${gx + gw - 16} Q${gx + gw} ${gb} ${gx + gw} ${gb - 16} V${gy}"/>
+  </svg>`;
+}
+
+function chipHTML(c) {
+  const bars = [...c.layers].reverse().map((L) =>
+    `<i style="flex:${L.f};background:${L.c};${L.op ? `opacity:${L.op};` : ""}"></i>`
+  ).join("");
+  return `<span class="chip">${bars}</span>`;
+}
+
+function recipeHTML(c) {
+  return `<ul class="recipe">` + [...c.layers].reverse().map((L) =>
+    `<li><span class="sw" style="background:${L.c}"></span>${L.n}<em>${L.q}</em></li>`
+  ).join("") + `</ul>`;
+}
+
+const wrap = document.getElementById("wrap");
+CAFES.forEach((c, i) => {
+  const num = String(i + 1).padStart(2, "0");
+  const panel = document.createElement("section");
+  panel.className = "panel";
+  panel.style.setProperty("--bg", c.bg);
+  panel.innerHTML = `
+    <div class="mini">
+      <span class="num">${num}</span>
+      <span class="vname">${c.name}</span>
+      ${chipHTML(c)}
+    </div>
+    <div class="full">
+      <div class="info">
+        <p class="num2">Nº ${num}</p>
+        <h2>${c.name}</h2>
+        <p class="sub">${c.sub}</p>
+        <p class="desc">${c.desc}</p>
+        ${recipeHTML(c)}
+      </div>
+      <div class="bigcup">${cupSVG(c)}</div>
+    </div>`;
+  wrap.appendChild(panel);
+});
+</script>
+</body>
+</html>
