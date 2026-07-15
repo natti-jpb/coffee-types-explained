@@ -311,6 +311,18 @@
     <linearGradient id="lg-ice" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFF8E8"/><stop offset="1" stop-color="#EFDFC0"/>
     </linearGradient>
+    <linearGradient id="lg-dal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8B168"/><stop offset="1" stop-color="#C8853C"/>
+    </linearGradient>
+    <linearGradient id="lg-ton" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0E7D0" stop-opacity=".8"/><stop offset="1" stop-color="#D9C9A6" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="lg-nit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E2C1F"/><stop offset="1" stop-color="#180E08"/>
+    </linearGradient>
+    <linearGradient id="lg-nhd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E5CBA2"/><stop offset="1" stop-color="#C6A375"/>
+    </linearGradient>
     <linearGradient id="lg-cyl" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="350" y2="0">
       <stop offset="0" stop-color="#3F2312" stop-opacity=".20"/>
       <stop offset=".26" stop-color="#FFFFFF" stop-opacity=".16"/>
@@ -397,6 +409,10 @@ const ING = {
   whiskey:   { en: "whiskey",        pt: "uísque",            de: "Whiskey" },
   coffee:    { en: "hot coffee",     pt: "café coado",        de: "heißer Kaffee" },
   icecream:  { en: "ice cream",      pt: "sorvete",           de: "Vanilleeis" },
+  dalgona:   { en: "whipped coffee", pt: "café batido",       de: "Kaffeecreme" },
+  tonic:     { en: "tonic water",    pt: "água tônica",       de: "Tonic Water" },
+  coldbrew:  { en: "cold brew",      pt: "cold brew",         de: "Cold Brew" },
+  nitrohead: { en: "creamy head",    pt: "colarinho cremoso", de: "cremige Krone" },
 };
 
 const QTY = {
@@ -406,6 +422,7 @@ const QTY = {
   shot:  { en: "a shot",  pt: "uma dose", de: "ein Shot" },
   scoop: { en: "a scoop", pt: "uma bola", de: "eine Kugel" },
   float: { en: "on top",  pt: "por cima", de: "obenauf" },
+  dbl:   { en: "a double", pt: "dose dupla", de: "doppelt" },
 };
 
 const FILLS = {
@@ -422,6 +439,10 @@ const FILLS = {
   whiskey:   { g: "lg-wsk", s: "#D29A57", d: "#8F5E2C", c: "#C68B4A", op: .95 },
   coffee:    { g: "lg-cof", s: "#5E3A20", d: "#26150B", c: "#4E2E18" },
   icecream:  { g: "lg-ice", s: "#FFF9EA", d: "#E4D2AE", c: "#FBF3E0", tex: "f-foam" },
+  dalgona:   { g: "lg-dal", s: "#F0BE78", d: "#A96D2D", c: "#DDA254", tex: "f-crema" },
+  tonic:     { g: "lg-ton", s: "#F4ECDA", d: "#C6B48F", c: "#E9DFC4", op: .85, bubbles: true },
+  coldbrew:  { g: "lg-nit", s: "#4A3423", d: "#120A05", c: "#2B1B10", streaks: true },
+  nitrohead: { g: "lg-nhd", s: "#EDD8B4", d: "#B08D5F", c: "#D9BE94", tex: "f-foam" },
 };
 
 /* ================= drinks ================= */
@@ -496,6 +517,14 @@ const CAFES = [
     ],
   },
   {
+    id: "einspaenner", name: "Einspänner", vessel: "henkel", fill: 0.90,
+    sub: { en: "vienna in a glass", pt: "viena num copo", de: "der Wiener Klassiker" },
+    layers: [
+      { i: "espresso", f: 0.55, q: "dbl" },
+      { i: "whip", f: 0.45, q: "top" },
+    ],
+  },
+  {
     id: "americano", name: "Americano", vessel: "mug", fill: 0.82,
     sub: { en: "long and mellow", pt: "alongado e suave", de: "lang und mild" },
     layers: [
@@ -526,6 +555,30 @@ const CAFES = [
     layers: [
       { i: "coldmilk", f: 0.62, q: "3/5" },
       { i: "espresso", f: 0.38, q: "2/5" },
+    ],
+  },
+  {
+    id: "dalgona", name: "Dalgona", vessel: "tumbler", fill: 0.88, noSteam: true, drops: true,
+    sub: { en: "the whipped one", pt: "o café batido", de: "der Aufgeschlagene" },
+    layers: [
+      { i: "coldmilk", f: 0.70, q: "2/3" },
+      { i: "dalgona", f: 0.30, q: "1/3" },
+    ],
+  },
+  {
+    id: "espressotonic", name: "Espresso Tonic", vessel: "highball", fill: 0.90, noSteam: true, drops: true, deco: "lemon",
+    sub: { en: "bright and bubbly", pt: "cítrico e borbulhante", de: "prickelnd und frisch" },
+    layers: [
+      { i: "tonic", f: 0.68, q: "2/3" },
+      { i: "espresso", f: 0.32, q: "1/3" },
+    ],
+  },
+  {
+    id: "nitro", name: "Nitro Cold Brew", vessel: "pint", fill: 0.92, noSteam: true, drops: true,
+    sub: { en: "poured like a stout", pt: "servido como stout", de: "gezapft wie Stout" },
+    layers: [
+      { i: "coldbrew", f: 0.82, q: "4/5" },
+      { i: "nitrohead", f: 0.18, q: "1/5" },
     ],
   },
 ];
@@ -619,6 +672,28 @@ const VESSELS = {
     ib: 9, lx: 334, sy: 446, srx: 88,
     extras: [
       { d: `M${CX - 54} 415 L${CX + 54} 415`, w: 2.5 },
+    ],
+  },
+  highball: {
+    p: { ty: 118, tw: 70, c1x: 69, c1y: 220, c2x: 66, c2y: 340, bw: 64, by: 428, r: 12 },
+    ib: 9, lx: 322, sy: 446, srx: 78,
+    extras: [
+      { d: `M${CX - 48} 415 L${CX + 48} 415`, w: 2.5 },
+    ],
+  },
+  henkel: {
+    p: { ty: 170, tw: 74, c1x: 72, c1y: 250, c2x: 66, c2y: 360, bw: 62, by: 428, r: 12 },
+    ib: 8, lx: 386, sy: 446, srx: 84,
+    extras: [
+      { d: `M${CX + 74} 210 C${CX + 128} 206 ${CX + 128} 300 ${CX + 68} 304`, w: 11 },
+      { d: `M${CX - 46} 416 L${CX + 46} 416`, w: 2.5 },
+    ],
+  },
+  pint: {
+    p: { ty: 140, tw: 84, c1x: 80, c1y: 240, c2x: 72, c2y: 350, bw: 66, by: 428, r: 12 },
+    ib: 9, lx: 336, sy: 446, srx: 92,
+    extras: [
+      { d: `M${CX - 50} 415 L${CX + 50} 415`, w: 2.5 },
     ],
   },
 };
@@ -719,8 +794,26 @@ function garnish(id, rx) {
 }
 
 /* toppers (unsquashed, sit on the top slice) */
+function whipDome(surfRx, scale, fill, tex, swirlColor) {
+  const R = surfRx * scale;
+  const dome = `M${-R} 2 Q${-R*1.02} -24 ${-R*.52} -30 Q${-R*.4} -42 ${-R*.05} -38
+      Q${R*.18} -50 ${R*.42} -36 Q${R*.98} -30 ${R} 2 Z`;
+  return `<path d="${dome}" fill="${fill}"/>
+    <path d="${dome}" fill="#fff" filter="url(#${tex})" opacity=".45"/>
+    <path d="${dome}" fill="none" stroke="#4A2E1B" stroke-width="2" opacity=".35"/>
+    <path d="M${-R*.6} -12 Q${-R*.15} -26 ${R*.25} -16" fill="none" stroke="${swirlColor}" stroke-width="2.4" opacity=".6"/>
+    <path d="M${R*.02} -38 Q${R*.14} -48 ${-R*.06} -54" fill="none" stroke="${swirlColor}" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>
+    <ellipse cx="${-R*.3}" cy="-24" rx="${R*.24}" ry="7" fill="#FFFFFF" opacity=".5"/>`;
+}
+
 function topper(id, y, surfRx) {
-  if (id === "icedlatte") {
+  if (id === "dalgona") {
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .52, "#E4AA5C", "f-crema", "#B37B33")}</g>`;
+  }
+  if (id === "einspaenner") {
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .55, "#FFFDF6", "f-foam", "#E3D0AC")}</g>`;
+  }
+  if (id === "icedlatte" || id === "espressotonic") {
     const cube = (tx, ty2, rot, s) =>
       `<g transform="translate(${tx} ${ty2}) rotate(${rot})">
         <rect x="${-s}" y="${-s}" width="${s*2}" height="${s*2}" rx="${s*.36}"
@@ -786,6 +879,16 @@ function slicesSVG(c) {
     const rot = (k % 2 ? 1.4 : -1.1).toFixed(1);
     const tex = fill.tex
       ? `<rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="#fff" filter="url(#${fill.tex})" opacity=".5"/>` : "";
+    let fx = "";
+    if (fill.bubbles) {
+      fx = [[-38,.2],[-20,.55],[-30,.82],[25,.3],[38,.65],[8,.78],[15,.14],[-5,.44]].map(([dx, fy], j) =>
+        `<circle cx="${CX + dx}" cy="${(y + h * fy).toFixed(1)}" r="${(2.2 + (j % 3) * .6).toFixed(1)}"
+          fill="rgba(255,255,255,.6)" stroke="rgba(170,150,110,.35)" stroke-width="1"/>`).join("");
+    }
+    if (fill.streaks) {
+      fx = [-42, -26, -8, 12, 30].map((dx) =>
+        `<path d="M${CX + dx} ${(y + 10).toFixed(1)} V${(y + h - 12).toFixed(1)}" stroke="rgba(225,195,155,.13)" stroke-width="3"/>`).join("");
+    }
     const gar = k === n - 1
       ? `<g transform="translate(${CX} ${y.toFixed(1)}) scale(1 ${RY})" style="filter:blur(.4px)">${garnish(c.id, surfRx)}</g>` +
         topper(c.id, y, surfRx)
@@ -795,7 +898,7 @@ function slicesSVG(c) {
         <ellipse cx="${CX}" cy="${(y + h).toFixed(1)}" rx="${botRx.toFixed(1)}" ry="${(botRx * RY).toFixed(1)}" fill="${fill.d}"${op}/>
         <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#${fill.g})"/>
         <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#lg-cyl)"/>
-        ${tex}
+        ${tex}${fx}
       </g>
       <ellipse cx="${CX}" cy="${y.toFixed(1)}" rx="${surfRx.toFixed(1)}" ry="${(surfRx * RY).toFixed(1)}" fill="${fill.s}"${op}/>
       <ellipse cx="${CX - surfRx * .3}" cy="${(y - surfRx * RY * .25).toFixed(1)}" rx="${(surfRx * .42).toFixed(1)}" ry="${(surfRx * RY * .4).toFixed(1)}" fill="#FFFFFF" opacity=".18"/>
@@ -824,6 +927,12 @@ function cupSVG(c) {
   const extras = v.extras.map((e) =>
     `<path class="extra" d="${e.d}" stroke-width="${e.w}"/>`).join("");
   const drops = c.drops ? dropsSVG() : "";
+  const deco = c.deco === "lemon"
+    ? `<g transform="translate(${CX + p.tw * 0.74} ${p.ty + 1}) rotate(-8)">
+        <circle r="16" fill="#F5D879" stroke="#D9A93E" stroke-width="2.4"/>
+        <circle r="11" fill="#FBEDB4" stroke="#EBCB74" stroke-width="1.6"/>
+        <path d="M0 -10 V10 M-10 0 H10 M-7 -7 L7 7 M7 -7 L-7 7" stroke="#EBCB74" stroke-width="1.4"/>
+      </g>` : "";
 
   return `<svg viewBox="${VB.x} ${VB.y} ${VB.w} ${VB.h}" role="img" aria-label="${c.name}">
     <defs><clipPath id="int-${c.id}"><path d="${bodyClosed(innerParams(p, v.ib))}"/></clipPath></defs>
@@ -836,7 +945,7 @@ function cupSVG(c) {
       <path class="outline" d="${bodyOpen(p)}" stroke-width="3"/>
       ${sheen}
       <ellipse fill="none" stroke="#4A2E1B" stroke-width="3" cx="${CX}" cy="${p.ty}" rx="${p.tw}" ry="${Math.max(6, p.tw * 0.14)}"/>
-      ${drops}
+      ${drops}${deco}
     </g>
   </svg>`;
 }
