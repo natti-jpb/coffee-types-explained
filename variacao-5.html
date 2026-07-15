@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffee, from the inside</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+  body {
+    background: #F6EDDD;
+    background-image:
+      radial-gradient(circle at 15% -10%, #FDF8EE 0%, transparent 55%),
+      radial-gradient(circle at 108% 112%, #EBD9BC 0%, transparent 45%);
+    color: #3E2415;
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  /* warm paper grain */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: .05;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 34px;
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    z-index: 5;
+  }
+  .brand { color: #8a6a4f; }
+  .langs { display: flex; gap: 6px; }
+  .langs button {
+    font: 600 11px Inter, sans-serif;
+    letter-spacing: .14em;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: #a98660;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color .25s, border-color .25s, background .25s;
+  }
+  .langs button:hover { color: #3E2415; }
+  .langs button.on {
+    color: #3E2415;
+    border-color: rgba(62, 36, 21, .25);
+    background: rgba(255, 253, 247, .7);
+  }
+
+  /* ---------- stage ---------- */
+  .stage-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1240px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 30px;
+  }
+
+  .ghost {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-weight: 340;
+    font-size: clamp(110px, 19vw, 250px);
+    color: rgba(62, 36, 21, .05);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    transition: opacity .35s ease;
+    will-change: transform;
+  }
+  .ghost.out { opacity: 0; }
+
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 330px 1fr;
+    align-items: center;
+    gap: 10px;
+    z-index: 1;
+  }
+
+  /* ---------- info column ---------- */
+  .info { transition: opacity .28s ease, transform .28s ease; }
+  .info.out { opacity: 0; transform: translateY(14px); }
+  .info .num { font-size: 11px; letter-spacing: .34em; color: #A5764C; text-transform: uppercase; }
+  .info h2 {
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-weight: 380;
+    font-size: clamp(44px, 4.6vw, 66px);
+    line-height: 1.02;
+    margin: 12px 0 8px;
+  }
+  .info .sub {
+    font-size: 11px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #A5764C;
+  }
+  .info .desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #7d5f46;
+    margin-top: 18px;
+    max-width: 300px;
+  }
+  .recipe { list-style: none; margin-top: 22px; display: flex; flex-direction: column; gap: 9px; }
+  .recipe li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: #5c4030;
+    max-width: 270px;
+  }
+  .recipe .sw {
+    width: 13px; height: 13px;
+    border-radius: 4px;
+    flex: none;
+    outline: 1px solid rgba(62, 36, 21, .15);
+  }
+  .recipe em { font-style: normal; margin-left: auto; color: #A5764C; font-weight: 600; }
+
+  /* ---------- figure ---------- */
+  .fig {
+    position: relative;
+    perspective: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  /* warm light behind the cup */
+  .fig::before {
+    content: "";
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    width: 470px;
+    height: 470px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(228, 166, 94, .26) 0%, rgba(228, 166, 94, 0) 68%);
+    filter: blur(24px);
+    pointer-events: none;
+  }
+  .fig svg {
+    width: min(560px, 100%);
+    overflow: visible;
+    will-change: transform;
+    position: relative;
+  }
+  .hint {
+    font-size: 11.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #b08f6b;
+    margin-top: 2px;
+    transition: opacity .5s;
+    animation: hintPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes hintPulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+  .fig.broken .hint, .fig.busy .hint { opacity: 0; animation: none; }
+
+  /* vessel */
+  #vesselFront path, #vesselFront ellipse { transition: none; }
+  #vesselFront, #glassBack { transition: opacity .5s ease; }
+  .fig.broken #vesselFront { opacity: .3; }
+  .fig.broken #glassBack { opacity: .25; }
+
+  .outline { fill: none; stroke: #4A2E1B; stroke-linecap: round; stroke-linejoin: round; }
+  .sheen path { fill: none; stroke-linecap: round; }
+  #shadow { filter: blur(7px); }
+  .shadow {
+    fill: #4A2A14;
+    opacity: .16;
+    transition: opacity .6s, transform .6s cubic-bezier(.22, 1, .36, 1);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .fig.broken .shadow { opacity: .22; transform: scale(1.15); }
+
+  /* layers */
+  .layer {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform .8s cubic-bezier(.3, 1.5, .42, 1) calc(var(--k) * 65ms),
+                filter .6s ease calc(var(--k) * 65ms);
+  }
+  .fig.broken .layer {
+    transform: translateY(calc(var(--k) * -42px)) rotate(var(--rot, 0deg));
+    filter: drop-shadow(0 16px 12px rgba(62, 36, 21, .22));
+  }
+  .par { will-change: transform; }
+
+  .lbl line {
+    stroke: #B08A63;
+    stroke-width: 1.3;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset .4s ease;
+  }
+  .lbl text {
+    font: 500 12.5px Inter, sans-serif;
+    fill: #6b4a33;
+    letter-spacing: .02em;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .fig.broken .lbl line { stroke-dashoffset: 0; transition-delay: calc(var(--k) * 65ms + .2s); }
+  .fig.broken .lbl text { opacity: 1; transform: none; transition-delay: calc(var(--k) * 65ms + .28s); }
+
+  /* steam — the appetite cue */
+  .steam { transition: opacity .35s; }
+  .fig.broken .steam, .fig.busy .steam { opacity: 0; }
+  .steam path {
+    fill: none;
+    stroke: #D9BD9E;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    filter: blur(2.2px);
+    opacity: 0;
+    animation: steam 4.4s ease-in-out infinite;
+  }
+  .steam path:nth-child(2) { animation-delay: 1.5s; animation-duration: 5s; stroke-width: 2.6; }
+  .steam path:nth-child(3) { animation-delay: 2.8s; animation-duration: 4.6s; stroke-width: 2.2; }
+  @keyframes steam {
+    0%, 100% { opacity: 0; transform: translateY(10px) scaleY(.96); }
+    30% { opacity: .75; }
+    75% { opacity: .1; transform: translateY(-16px) scaleY(1.05); }
+  }
+
+  /* ---------- dock ---------- */
+  .dock {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px 26px;
+    flex-wrap: wrap;
+    z-index: 2;
+  }
+  .dock button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 10px 8px;
+    border-radius: 14px;
+    color: #a98660;
+    transition: color .3s, background .3s, transform .3s cubic-bezier(.22, 1, .36, 1);
+  }
+  .dock button:hover { transform: translateY(-4px); color: #3E2415; }
+  .dock button.on { color: #3E2415; background: rgba(255, 253, 247, .8); box-shadow: 0 10px 24px -14px rgba(62, 36, 21, .3); }
+  .dock svg { width: 30px; height: 38px; }
+  .dock svg path { fill: none; stroke: currentColor; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; }
+  .dock span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+
+  footer {
+    text-align: center;
+    padding: 0 20px 20px;
+    font-size: 11.5px;
+    color: #a98a6f;
+  }
+
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: 1fr; gap: 4px; }
+    .info { text-align: center; }
+    .info .desc, .recipe li { margin-left: auto; margin-right: auto; }
+    .ghost { font-size: 26vw; }
+    .fig svg { width: min(440px, 96vw); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand" id="brand">coffee types</span>
+  <div class="langs" id="langs">
+    <button data-lang="en">EN</button>
+    <button data-lang="pt">PT</button>
+    <button data-lang="de">DE</button>
+  </div>
+</nav>
+
+<main class="stage-wrap">
+  <div class="ghost" id="ghost"></div>
+  <section class="stage">
+    <div class="info" id="info">
+      <p class="num" id="iNum"></p>
+      <h2 id="iName"></h2>
+      <p class="sub" id="iSub"></p>
+      <p class="desc" id="iDesc"></p>
+      <ul class="recipe" id="iRecipe"></ul>
+    </div>
+
+    <figure class="fig" id="fig">
+      <svg id="cup" viewBox="0 0 580 560" role="img" aria-label="coffee diagram">
+        <defs>
+          <clipPath id="int"><path id="intPath"/></clipPath>
+          <filter id="wob" x="-25%" y="-25%" width="150%" height="150%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.11" numOctaves="1" seed="4" result="n"/>
+            <feDisplacementMap id="wobMap" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+
+          <!-- liquid gradients: warm & rich -->
+          <linearGradient id="lg-esp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5C3317"/><stop offset=".45" stop-color="#3B1F0F"/><stop offset="1" stop-color="#26120A"/>
+          </linearGradient>
+          <linearGradient id="lg-cre" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#EBAC60"/><stop offset="1" stop-color="#C07A32"/>
+          </linearGradient>
+          <linearGradient id="lg-mlk" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F8EAD6"/><stop offset="1" stop-color="#E0C6A2"/>
+          </linearGradient>
+          <linearGradient id="lg-fom" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFF9EE"/><stop offset="1" stop-color="#EEDDBF"/>
+          </linearGradient>
+          <linearGradient id="lg-cho" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8A4E28"/><stop offset=".55" stop-color="#66381C"/><stop offset="1" stop-color="#4A2610"/>
+          </linearGradient>
+          <linearGradient id="lg-whp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFFDF6"/><stop offset="1" stop-color="#F0E3CB"/>
+          </linearGradient>
+          <linearGradient id="lg-wtr" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#C08356" stop-opacity=".92"/><stop offset="1" stop-color="#8A5E3B" stop-opacity=".92"/>
+          </linearGradient>
+
+          <!-- cylinder shading overlay -->
+          <linearGradient id="lg-cyl" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="350" y2="0">
+            <stop offset="0" stop-color="#3F2312" stop-opacity=".20"/>
+            <stop offset=".26" stop-color="#FFFFFF" stop-opacity=".16"/>
+            <stop offset=".52" stop-color="#FFFFFF" stop-opacity="0"/>
+            <stop offset="1" stop-color="#3F2312" stop-opacity=".18"/>
+          </linearGradient>
+
+          <!-- textures -->
+          <filter id="f-crema" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.45 0.28" numOctaves="2" seed="7" result="n"/>
+            <feColorMatrix in="n" type="matrix"
+              values="0 0 0 0 0.95  0 0 0 0 0.72  0 0 0 0 0.40  0 0 0 0.6 0" result="c"/>
+            <feComposite in="c" in2="SourceGraphic" operator="in"/>
+          </filter>
+          <filter id="f-foam" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9 0.65" numOctaves="2" seed="3" result="n"/>
+            <feColorMatrix in="n" type="matrix"
+              values="0 0 0 0 1  0 0 0 0 0.98  0 0 0 0 0.92  0 0 0 0.55 0" result="c"/>
+            <feComposite in="c" in2="SourceGraphic" operator="in"/>
+          </filter>
+        </defs>
+
+        <ellipse id="shadow" class="shadow"/>
+        <g id="steam" class="steam"></g>
+        <path id="glassBack"/>
+        <g id="slices"></g>
+        <g id="vesselFront">
+          <g id="extrasA"></g>
+          <g id="extrasB"></g>
+          <path id="outline" class="outline" stroke-width="3"/>
+          <g id="sheen" class="sheen"></g>
+          <ellipse id="rim" fill="none" stroke="#4A2E1B" stroke-width="3"/>
+        </g>
+      </svg>
+      <figcaption class="hint" id="hint"></figcaption>
+    </figure>
+  </section>
+
+  <div class="dock" id="dock"></div>
+</main>
+
+<footer id="footer"></footer>
+
+<script>
+/* ================= i18n ================= */
+const UI = {
+  en: {
+    docTitle: "Coffee, from the inside",
+    brand: "coffee types",
+    hint: "hover the cup — break it apart",
+    hintTouch: "tap the cup — break it apart",
+    footer: "Approximate proportions — every barista has their own. Use ← → to switch drinks.",
+    num: "Nº",
+  },
+  pt: {
+    docTitle: "Os cafés, por dentro",
+    brand: "tipos de café",
+    hint: "passe o mouse na xícara — quebre em camadas",
+    hintTouch: "toque na xícara — quebre em camadas",
+    footer: "Proporções aproximadas — cada barista tem a sua. Use ← → para trocar de bebida.",
+    num: "Nº",
+  },
+  de: {
+    docTitle: "Kaffee, von innen",
+    brand: "kaffeesorten",
+    hint: "über die Tasse fahren — in Schichten zerlegen",
+    hintTouch: "Tasse antippen — in Schichten zerlegen",
+    footer: "Ungefähre Proportionen — jeder Barista hat seine eigenen. ← → zum Wechseln.",
+    num: "Nr.",
+  },
+};
+
+const ING = {
+  espresso:  { en: "espresso",      pt: "espresso",         de: "Espresso" },
+  crema:     { en: "crema",         pt: "crema",            de: "Crema" },
+  milk:      { en: "steamed milk",  pt: "leite vaporizado", de: "heiße Milch" },
+  foam:      { en: "milk foam",     pt: "espuma de leite",  de: "Milchschaum" },
+  microfoam: { en: "microfoam",     pt: "microespuma",      de: "Mikroschaum" },
+  chocolate: { en: "chocolate",     pt: "chocolate",        de: "Schokolade" },
+  whip:      { en: "whipped cream", pt: "chantilly",        de: "Schlagsahne" },
+  water:     { en: "hot water",     pt: "água quente",      de: "heißes Wasser" },
+};
+
+const QTY = {
+  top:  { en: "top",    pt: "topo", de: "oben" },
+  veil: { en: "a veil", pt: "véu",  de: "ein Hauch" },
+};
+
+/* g = body gradient · s = surface tone · d = underside tone · c = swatch */
+const FILLS = {
+  espresso:  { g: "lg-esp", s: "#55301A", d: "#1F0E07", c: "#3A2114" },
+  crema:     { g: "lg-cre", s: "#EFB86D", d: "#A96D2D", c: "#C98A4B", tex: "f-crema" },
+  milk:      { g: "lg-mlk", s: "#FAEFE0", d: "#CDB08C", c: "#E9D8C1" },
+  foam:      { g: "lg-fom", s: "#FFFAF0", d: "#E3D0B0", c: "#F6EDDE", tex: "f-foam" },
+  microfoam: { g: "lg-fom", s: "#FFFAF0", d: "#E3D0B0", c: "#F6EDDE", tex: "f-foam" },
+  chocolate: { g: "lg-cho", s: "#8F5229", d: "#3E1F0C", c: "#6B3A21" },
+  whip:      { g: "lg-whp", s: "#FFFDF6", d: "#E8D9BE", c: "#FBF4E6", tex: "f-foam" },
+  water:     { g: "lg-wtr", s: "#C08C64", d: "#7C5636", c: "#A5754F", op: .9 },
+};
+
+/* ================= drinks ================= */
+const CAFES = [
+  {
+    id: "espresso", name: "Espresso", vessel: "demitasse", fill: 0.72,
+    sub: { en: "where it all starts", pt: "a base de tudo", de: "die Basis von allem" },
+    desc: {
+      en: "30 ml pulled under 9 bars of pressure. Intense and full-bodied, crowned with a golden crema.",
+      pt: "30 ml extraídos sob 9 bars de pressão. Intenso e encorpado, coroado por uma crema dourada.",
+      de: "30 ml, extrahiert unter 9 Bar Druck. Intensiv und vollmundig, gekrönt von goldener Crema.",
+    },
+    layers: [
+      { i: "espresso", f: 0.80, q: "30 ml" },
+      { i: "crema", f: 0.20, q: "top" },
+    ],
+  },
+  {
+    id: "macchiato", name: "Macchiato", vessel: "shotglass", fill: 0.55,
+    sub: { en: "a stained espresso", pt: "espresso manchado", de: "ein gefleckter Espresso" },
+    desc: {
+      en: "An espresso “stained” with a spoonful of milk foam. The coffee stays in charge.",
+      pt: "Um espresso “manchado” por uma colher de espuma de leite. O café continua no comando.",
+      de: "Ein Espresso, „befleckt“ mit einem Löffel Milchschaum. Der Kaffee behält das Sagen.",
+    },
+    layers: [
+      { i: "espresso", f: 0.70, q: "2/3" },
+      { i: "foam", f: 0.30, q: "1/3" },
+    ],
+  },
+  {
+    id: "cortado", name: "Cortado", vessel: "gibraltar", fill: 0.62,
+    sub: { en: "half and half", pt: "meio a meio", de: "halb und halb" },
+    desc: {
+      en: "Espresso cut with an equal part of steamed milk. Balance, the Spanish way.",
+      pt: "Espresso cortado por partes iguais de leite vaporizado. Equilíbrio de origem espanhola.",
+      de: "Espresso, geschnitten mit gleich viel heißer Milch. Balance auf Spanisch.",
+    },
+    layers: [
+      { i: "espresso", f: 0.50, q: "1/2" },
+      { i: "milk", f: 0.50, q: "1/2" },
+    ],
+  },
+  {
+    id: "flatwhite", name: "Flat White", vessel: "tulip", fill: 0.85,
+    sub: { en: "velvet smooth", pt: "veludo australiano", de: "samtig glatt" },
+    desc: {
+      en: "A double shot under velvety microfoam. Silky texture, coffee-forward.",
+      pt: "Espresso duplo sob leite com microespuma finíssima. Textura aveludada, sabor presente.",
+      de: "Ein doppelter Espresso unter samtigem Mikroschaum. Seidige Textur, kräftiger Kaffee.",
+    },
+    layers: [
+      { i: "espresso", f: 0.34, q: "1/3" },
+      { i: "milk", f: 0.55, q: "2/3" },
+      { i: "microfoam", f: 0.11, q: "veil" },
+    ],
+  },
+  {
+    id: "cappuccino", name: "Cappuccino", vessel: "cappuccino", fill: 0.88,
+    sub: { en: "the italian trinity", pt: "a trindade italiana", de: "die italienische Dreifaltigkeit" },
+    desc: {
+      en: "One third espresso, one third milk, one third foam. The Italian classic in perfect ratio.",
+      pt: "Um terço espresso, um terço leite, um terço espuma. O clássico italiano em proporção perfeita.",
+      de: "Ein Drittel Espresso, ein Drittel Milch, ein Drittel Schaum. Der italienische Klassiker.",
+    },
+    layers: [
+      { i: "espresso", f: 1 / 3, q: "1/3" },
+      { i: "milk", f: 1 / 3, q: "1/3" },
+      { i: "foam", f: 1 / 3, q: "1/3" },
+    ],
+  },
+  {
+    id: "latte", name: "Latte", vessel: "latteglass", fill: 0.93,
+    sub: { en: "a milky embrace", pt: "abraço de leite", de: "eine milchige Umarmung" },
+    desc: {
+      en: "One espresso wrapped in plenty of steamed milk under a thin crown of foam.",
+      pt: "Um espresso envolvido por muito leite vaporizado e uma fina coroa de espuma.",
+      de: "Ein Espresso, umhüllt von viel heißer Milch, mit einer feinen Schaumkrone.",
+    },
+    layers: [
+      { i: "espresso", f: 0.17, q: "1/6" },
+      { i: "milk", f: 0.66, q: "4/6" },
+      { i: "foam", f: 0.17, q: "1/6" },
+    ],
+  },
+  {
+    id: "mochaccino", name: "Mochaccino", vessel: "mochaglass", fill: 0.90,
+    sub: { en: "coffee meets chocolate", pt: "café com chocolate", de: "Kaffee trifft Schokolade" },
+    desc: {
+      en: "Chocolate, espresso and steamed milk under whipped cream. Where coffee meets dessert.",
+      pt: "Chocolate, espresso e leite vaporizado, coberto por chantilly. A ponte entre café e sobremesa.",
+      de: "Schokolade, Espresso und heiße Milch unter Schlagsahne. Kaffee trifft Dessert.",
+    },
+    layers: [
+      { i: "chocolate", f: 0.25, q: "1/4" },
+      { i: "espresso", f: 0.25, q: "1/4" },
+      { i: "milk", f: 0.40, q: "2/4" },
+      { i: "whip", f: 0.10, q: "top" },
+    ],
+  },
+  {
+    id: "americano", name: "Americano", vessel: "mug", fill: 0.82,
+    sub: { en: "long and mellow", pt: "alongado e suave", de: "lang und mild" },
+    desc: {
+      en: "Espresso stretched with hot water. The body of filter coffee, the soul of espresso.",
+      pt: "Espresso alongado com água quente. Corpo de coado, alma de espresso.",
+      de: "Espresso, verlängert mit heißem Wasser. Körper wie Filterkaffee, Seele wie Espresso.",
+    },
+    layers: [
+      { i: "espresso", f: 1 / 3, q: "1/3" },
+      { i: "water", f: 2 / 3, q: "2/3" },
+    ],
+  },
+];
+
+/* ================= vessels ================= */
+const CX = 240;
+const RY = 0.16; /* ellipse squash for liquid surfaces */
+
+const VESSELS = {
+  demitasse: {
+    p: { ty: 272, tw: 94, c1x: 90, c1y: 330, c2x: 72, c2y: 400, bw: 64, by: 428, r: 14 },
+    ib: 7, lx: 408, sy: 468, srx: 118,
+    extras: [
+      { d: `M${CX + 94} 300 C${CX + 150} 296 ${CX + 152} 372 ${CX + 82} 380`, w: 13 },
+      { d: `M${CX - 120} 452 Q${CX} 492 ${CX + 120} 452`, w: 5 },
+    ],
+  },
+  shotglass: {
+    p: { ty: 250, tw: 76, c1x: 69, c1y: 310, c2x: 62, c2y: 372, bw: 56, by: 428, r: 10 },
+    ib: 11, lx: 350, sy: 446, srx: 74,
+    extras: [
+      { d: `M${CX - 42} 417 L${CX + 42} 417`, w: 2.5 },
+    ],
+  },
+  gibraltar: {
+    p: { ty: 228, tw: 92, c1x: 87, c1y: 295, c2x: 82, c2y: 365, bw: 78, by: 428, r: 12 },
+    ib: 13, lx: 366, sy: 446, srx: 96,
+    extras: [
+      { d: `M${CX - 62} 415 L${CX + 62} 415`, w: 2.5 },
+    ],
+  },
+  tulip: {
+    p: { ty: 236, tw: 106, c1x: 104, c1y: 310, c2x: 84, c2y: 396, bw: 62, by: 428, r: 16 },
+    ib: 7, lx: 416, sy: 470, srx: 128,
+    extras: [
+      { d: `M${CX + 106} 300 C${CX + 162} 298 ${CX + 162} 366 ${CX + 92} 372`, w: 13 },
+      { d: `M${CX - 128} 452 Q${CX} 494 ${CX + 128} 452`, w: 5 },
+    ],
+  },
+  cappuccino: {
+    p: { ty: 222, tw: 118, c1x: 120, c1y: 300, c2x: 88, c2y: 396, bw: 68, by: 428, r: 16 },
+    ib: 7, lx: 436, sy: 470, srx: 140,
+    extras: [
+      { d: `M${CX + 118} 286 C${CX + 178} 286 ${CX + 178} 360 ${CX + 100} 366`, w: 13 },
+      { d: `M${CX - 136} 452 Q${CX} 496 ${CX + 136} 452`, w: 5 },
+    ],
+  },
+  latteglass: {
+    p: { ty: 118, tw: 86, c1x: 88, c1y: 230, c2x: 70, c2y: 360, bw: 64, by: 418, r: 14 },
+    ib: 7, lx: 360, sy: 462, srx: 78,
+    extras: [
+      { d: `M${CX - 16} 418 L${CX - 24} 448 M${CX + 16} 418 L${CX + 24} 448`, w: 6 },
+      { d: `M${CX - 38} 450 L${CX + 38} 450`, w: 7 },
+    ],
+  },
+  mochaglass: {
+    p: { ty: 168, tw: 100, c1x: 96, c1y: 240, c2x: 52, c2y: 316, bw: 34, by: 340, r: 12 },
+    ib: 6, lx: 374, sy: 452, srx: 72,
+    extras: [
+      { d: `M${CX} 340 L${CX} 404`, w: 13 },
+      { d: `M${CX - 48} 410 Q${CX} 396 ${CX + 48} 410 Q${CX} 424 ${CX - 48} 410 Z`, w: 4 },
+    ],
+  },
+  mug: {
+    p: { ty: 200, tw: 96, c1x: 96, c1y: 276, c2x: 96, c2y: 352, bw: 96, by: 428, r: 14 },
+    ib: 7, lx: 424, sy: 448, srx: 116,
+    extras: [
+      { d: `M${CX + 96} 232 C${CX + 164} 228 ${CX + 164} 344 ${CX + 94} 340`, w: 16 },
+    ],
+  },
+};
+
+/* ================= geometry ================= */
+function bodyClosed(p) {
+  return `M${CX - p.tw} ${p.ty} L${CX + p.tw} ${p.ty}` +
+    ` C${CX + p.c1x} ${p.c1y} ${CX + p.c2x} ${p.c2y} ${CX + p.bw} ${p.by - p.r}` +
+    ` Q${CX + p.bw} ${p.by} ${CX + p.bw - p.r} ${p.by}` +
+    ` L${CX - p.bw + p.r} ${p.by}` +
+    ` Q${CX - p.bw} ${p.by} ${CX - p.bw} ${p.by - p.r}` +
+    ` C${CX - p.c2x} ${p.c2y} ${CX - p.c1x} ${p.c1y} ${CX - p.tw} ${p.ty} Z`;
+}
+function bodyOpen(p) {
+  return `M${CX - p.tw} ${p.ty}` +
+    ` C${CX - p.c1x} ${p.c1y} ${CX - p.c2x} ${p.c2y} ${CX - p.bw} ${p.by - p.r}` +
+    ` Q${CX - p.bw} ${p.by} ${CX - p.bw + p.r} ${p.by}` +
+    ` L${CX + p.bw - p.r} ${p.by}` +
+    ` Q${CX + p.bw} ${p.by} ${CX + p.bw} ${p.by - p.r}` +
+    ` C${CX + p.c2x} ${p.c2y} ${CX + p.c1x} ${p.c1y} ${CX + p.tw} ${p.ty}`;
+}
+function innerParams(p, ib) {
+  const s = 7;
+  return {
+    ty: p.ty + s, tw: p.tw - s,
+    c1x: p.c1x - s, c1y: p.c1y,
+    c2x: p.c2x - s, c2y: p.c2y,
+    bw: p.bw - s, by: p.by - ib,
+    r: Math.max(6, p.r - 4),
+  };
+}
+function lerpP(a, b, t) {
+  const o = {};
+  for (const k in a) o[k] = a[k] + (b[k] - a[k]) * t;
+  return o;
+}
+const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const cubicAt = (a, b, c, d, t) => {
+  const u = 1 - t;
+  return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d;
+};
+/* half-width of the interior wall at height y */
+function halfAt(p, y) {
+  const y0 = p.ty, y3 = p.by - p.r;
+  if (y <= y0) return p.tw;
+  if (y >= y3) return p.bw;
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 18; i++) {
+    const t = (lo + hi) / 2;
+    (cubicAt(y0, p.c1y, p.c2y, y3, t) < y) ? lo = t : hi = t;
+  }
+  const t = (lo + hi) / 2;
+  return cubicAt(p.tw, p.c1x, p.c2x, p.bw, t);
+}
+
+/* ================= dom ================= */
+const $ = (id) => document.getElementById(id);
+const fig = $("fig"), slicesG = $("slices"), outlineEl = $("outline"),
+      glassBack = $("glassBack"), rim = $("rim"), sheen = $("sheen"),
+      intPath = $("intPath"), shadowEl = $("shadow"), steamG = $("steam"),
+      extrasA = $("extrasA"), extrasB = $("extrasB"), ghost = $("ghost"),
+      info = $("info"), dock = $("dock"), wobMap = $("wobMap");
+
+let lang = localStorage.getItem("coffee-lang") || "en";
+if (!UI[lang]) lang = "en";
+let cur = 0;
+let busy = false;
+let extrasFlip = false;
+const touchMode = matchMedia("(hover: none)").matches;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ================= vessel art ================= */
+function updateVesselArt(p, ib) {
+  outlineEl.setAttribute("d", bodyOpen(p));
+  glassBack.setAttribute("d", bodyClosed(p));
+  glassBack.setAttribute("fill", "rgba(255,250,242,.30)");
+  intPath.setAttribute("d", bodyClosed(innerParams(p, ib)));
+  rim.setAttribute("cx", CX);
+  rim.setAttribute("cy", p.ty);
+  rim.setAttribute("rx", p.tw);
+  rim.setAttribute("ry", Math.max(6, p.tw * 0.14));
+  shadowEl.setAttribute("cx", CX);
+  shadowEl.setAttribute("rx", 0); /* set below */
+  const h = p.by - p.ty;
+  sheen.innerHTML =
+    `<path d="M${CX - p.tw * 0.62} ${p.ty + 26} C${CX - p.tw * 0.74} ${p.ty + h * 0.42} ${CX - p.bw * 0.78} ${p.by - h * 0.3} ${CX - p.bw * 0.52} ${p.by - 24}"
+       stroke="rgba(255,255,255,.5)" stroke-width="8" style="filter:blur(2.5px)"/>` +
+    `<path d="M${CX - p.tw * 0.62} ${p.ty + 30} C${CX - p.tw * 0.72} ${p.ty + h * 0.4} ${CX - p.bw * 0.74} ${p.by - h * 0.32} ${CX - p.bw * 0.54} ${p.by - 32}"
+       stroke="rgba(255,255,255,.75)" stroke-width="2.5" style="filter:blur(.8px)"/>` +
+    `<path d="M${CX + p.tw * 0.56} ${p.ty + 28} C${CX + p.tw * 0.6} ${p.ty + h * 0.22} ${CX + p.tw * 0.56} ${p.ty + h * 0.3} ${CX + p.tw * 0.5} ${p.ty + h * 0.42}"
+       stroke="rgba(255,255,255,.4)" stroke-width="5" style="filter:blur(2px)"/>`;
+}
+
+function drawStatics(vName) {
+  const v = VESSELS[vName];
+  updateVesselArt(v.p, v.ib);
+  shadowEl.setAttribute("cy", v.sy);
+  shadowEl.setAttribute("rx", v.srx);
+  shadowEl.setAttribute("ry", 9);
+  drawSteam(v.p.ty);
+  const target = extrasFlip ? extrasB : extrasA;
+  target.innerHTML = v.extras.map((e) =>
+    `<path d="${e.d}" stroke-width="${e.w}" fill="none" stroke="#4A2E1B" stroke-linecap="round"/>`).join("");
+}
+
+function drawSteam(rimY) {
+  const y = rimY - 20;
+  steamG.innerHTML = `
+    <path d="M${CX - 18} ${y} C${CX - 28} ${y - 20} ${CX - 8} ${y - 36} ${CX - 18} ${y - 60}"/>
+    <path d="M${CX + 16} ${y + 4} C${CX + 6} ${y - 16} ${CX + 26} ${y - 32} ${CX + 16} ${y - 56}"/>
+    <path d="M${CX - 1} ${y - 8} C${CX - 9} ${y - 26} ${CX + 7} ${y - 40} ${CX - 1} ${y - 64}"/>`;
+}
+
+/* ================= garnish (latte art & toppings) ================= */
+const COCOA = [[-.55,.2],[-.3,-.4],[-.1,.5],[.15,-.25],[.4,.35],[.62,-.1],[-.7,-.08],[.05,.1],[.3,-.55],[-.45,-.6],[.65,.45],[-.2,.05],[.5,.62],[-.62,.55],[.76,.18],[-.05,-.66]];
+
+function garnish(id, rx) {
+  const R = rx;
+  switch (id) {
+    case "espresso":
+      return `<path d="M${-R*.5} 0 Q0 ${-R*.42} ${R*.5} 0 Q0 ${R*.42} ${-R*.5} 0"
+        fill="none" stroke="#A96D2D" stroke-width="2.4" opacity=".55"/>` +
+        [0,1,2,3,4,5].map(i => {
+          const a = i / 6 * Math.PI * 2;
+          return `<circle cx="${Math.cos(a)*R*.74}" cy="${Math.sin(a)*R*.74}" r="2.6" fill="#8A5A2E" opacity=".4"/>`;
+        }).join("");
+    case "macchiato":
+      return `<ellipse rx="${R*.44}" ry="${R*.44}" fill="#FFFDF4" opacity=".95"/>` +
+        `<ellipse cx="${-R*.12}" cy="${-R*.12}" rx="${R*.2}" ry="${R*.2}" fill="#FFFFFF" opacity=".8"/>`;
+    case "cortado":
+      return `<ellipse rx="${R*.72}" ry="${R*.72}" fill="none" stroke="#D9A968" stroke-width="3" opacity=".5"/>` +
+        `<ellipse rx="${R*.4}" ry="${R*.4}" fill="none" stroke="#D9A968" stroke-width="2" opacity=".35"/>`;
+    case "flatwhite": {
+      let s = `<path d="M0 ${-R*.66} L0 ${R*.66}" stroke="#C98A4B" stroke-width="2.6" fill="none" opacity=".5"/>`;
+      [-.42, -.08, .26, .58].forEach((yy) => {
+        s += `<path d="M${-R*.44} ${yy*R} Q0 ${(yy-.3)*R} ${R*.44} ${yy*R}" stroke="#C98A4B" stroke-width="2.6" fill="none" opacity=".5"/>`;
+      });
+      return s;
+    }
+    case "cappuccino":
+      return COCOA.map(([x, y]) =>
+        `<circle cx="${x*R*.82}" cy="${y*R*.82}" r="${2 + (Math.abs(x*7)%2)}" fill="#7A4B22" opacity=".5"/>`).join("");
+    case "latte":
+      return `<path d="M0 ${-R*.22} C${R*.5} ${-R*.7} ${R*.95} ${-R*.08} 0 ${R*.58} C${-R*.95} ${-R*.08} ${-R*.5} ${-R*.7} 0 ${-R*.22} Z"
+        fill="#C98A4B" opacity=".5"/>`;
+    case "mochaccino":
+      return `<path d="M${-R*.72} ${R*.05} C${-R*.52} ${-R*.5} ${-R*.42} ${R*.55} ${-R*.22} ${R*.02}
+        C${-R*.02} ${-R*.5} ${R*.08} ${R*.55} ${R*.28} 0
+        C${R*.48} ${-R*.5} ${R*.58} ${R*.5} ${R*.74} ${-R*.05}"
+        fill="none" stroke="#4E2A12" stroke-width="3" stroke-linecap="round" opacity=".8"/>`;
+    case "americano":
+      return `<path d="M${-R*.58} ${R*.1} C${-R*.2} ${-R*.5} ${R*.28} ${-R*.42} ${R*.6} ${-R*.05}"
+        fill="none" stroke="#C08C64" stroke-width="2.6" opacity=".5"/>` +
+        `<circle cx="${R*.3}" cy="${R*.3}" r="2.4" fill="#C08C64" opacity=".45"/>` +
+        `<circle cx="${-R*.15}" cy="${R*.42}" r="1.8" fill="#C08C64" opacity=".4"/>`;
+    default: return "";
+  }
+}
+
+/* ================= slices ================= */
+function sliceGeom(c) {
+  const v = VESSELS[c.vessel];
+  const ip = innerParams(v.p, v.ib);
+  const ih = ip.by - ip.ty;
+  const liquidH = c.fill * ih;
+  let cursor = ip.by;
+  return c.layers.map((L, k) => {
+    const h = L.f * liquidH;
+    const y = cursor - h;
+    cursor = y;
+    return { L, k, y, h, yc: y + h / 2, lx: v.lx, ip };
+  });
+}
+
+function qty(q) { return typeof QTY[q] === "object" ? QTY[q][lang] : q; }
+
+function buildSlices(c) {
+  const n = c.layers.length;
+  slicesG.innerHTML = sliceGeom(c).map(({ L, k, y, h, yc, lx, ip }) => {
+    const fill = FILLS[L.i];
+    const depth = (k - (n - 1) / 2) * 5;
+    const op = fill.op ? ` fill-opacity="${fill.op}"` : "";
+    const surfRx = Math.max(8, halfAt(ip, y) - 2);
+    const botRx = Math.max(8, halfAt(ip, Math.min(y + h, ip.by)) - 2);
+    const rot = (k % 2 ? 1.4 : -1.1).toFixed(1);
+    const tex = fill.tex
+      ? `<rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="#fff" filter="url(#${fill.tex})" opacity=".5"/>` : "";
+    const gar = k === n - 1
+      ? `<g transform="translate(${CX} ${y.toFixed(1)}) scale(1 ${RY})" style="filter:blur(.4px)">${garnish(c.id, surfRx)}</g>` : "";
+    return `<g class="layer" style="--k:${k};--rot:${rot}deg">
+      <g class="par" data-depth="${depth.toFixed(1)}">
+        <g clip-path="url(#int)">
+          <ellipse cx="${CX}" cy="${(y + h).toFixed(1)}" rx="${botRx.toFixed(1)}" ry="${(botRx * RY).toFixed(1)}" fill="${fill.d}"${op}/>
+          <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#${fill.g})"/>
+          <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#lg-cyl)"/>
+          ${tex}
+        </g>
+        <ellipse cx="${CX}" cy="${y.toFixed(1)}" rx="${surfRx.toFixed(1)}" ry="${(surfRx * RY).toFixed(1)}" fill="${fill.s}"${op}/>
+        <ellipse cx="${CX - surfRx * .3}" cy="${(y - surfRx * RY * .25).toFixed(1)}" rx="${(surfRx * .42).toFixed(1)}" ry="${(surfRx * RY * .4).toFixed(1)}" fill="#FFFFFF" opacity=".18"/>
+        ${gar}
+      </g>
+      <g class="lbl">
+        <line x1="${lx}" y1="${yc.toFixed(1)}" x2="${lx + 15}" y2="${yc.toFixed(1)}" pathLength="1"/>
+        <text x="${lx + 21}" y="${(yc + 4).toFixed(1)}">${ING[L.i][lang]} · ${qty(L.q)}</text>
+      </g>
+    </g>`;
+  }).join("");
+}
+
+function setInfo(c, i) {
+  $("iNum").textContent = `${UI[lang].num} ${String(i + 1).padStart(2, "0")}`;
+  $("iName").textContent = c.name;
+  $("iSub").textContent = c.sub[lang];
+  $("iDesc").textContent = c.desc[lang];
+  $("iRecipe").innerHTML = [...c.layers].reverse().map((L) =>
+    `<li><span class="sw" style="background:${FILLS[L.i].c}"></span>${ING[L.i][lang]}<em>${qty(L.q)}</em></li>`
+  ).join("");
+  ghost.textContent = c.name;
+}
+
+/* ================= animations ================= */
+function pour(c) {
+  const slices = [...slicesG.querySelectorAll(".layer")];
+  const geom = sliceGeom(c);
+  slicesG.setAttribute("filter", "url(#wob)");
+  slices.forEach((el, k) => {
+    const d = geom[k].ip.by - geom[k].y + 50;
+    const anim = el.animate(
+      [{ transform: `translateY(${d}px)` }, { transform: "translateY(0)" }],
+      { duration: reduced ? 0 : 700, delay: reduced ? 0 : k * 130, easing: "cubic-bezier(.25,1,.4,1)", fill: "both" }
+    );
+    anim.onfinish = () => anim.cancel();
+  });
+  const t0 = performance.now();
+  const dur = reduced ? 1 : 1400;
+  (function wobble(now) {
+    const t = Math.min(1, (now - t0) / dur);
+    wobMap.setAttribute("scale", (15 * (1 - t) * (1 - t)).toFixed(2));
+    if (t < 1) requestAnimationFrame(wobble);
+    else slicesG.removeAttribute("filter");
+  })(t0);
+}
+
+function drain() {
+  return new Promise((res) => {
+    const slices = [...slicesG.querySelectorAll(".layer")];
+    if (!slices.length || reduced) { slicesG.innerHTML = ""; return res(); }
+    let done = 0;
+    slices.forEach((el, k) => {
+      const anim = el.animate(
+        [{ transform: "translateY(0)", opacity: 1 }, { transform: "translateY(90px)", opacity: 0 }],
+        { duration: 340, delay: (slices.length - 1 - k) * 55, easing: "cubic-bezier(.5,0,.8,.4)", fill: "forwards" }
+      );
+      anim.onfinish = () => { if (++done === slices.length) { slicesG.innerHTML = ""; res(); } };
+    });
+  });
+}
+
+function morphVessel(fromV, toV) {
+  return new Promise((res) => {
+    const a = VESSELS[fromV], b = VESSELS[toV];
+    const oldG = extrasFlip ? extrasB : extrasA;
+    extrasFlip = !extrasFlip;
+    const newG = extrasFlip ? extrasB : extrasA;
+    newG.innerHTML = b.extras.map((e) =>
+      `<path d="${e.d}" stroke-width="${e.w}" fill="none" stroke="#4A2E1B" stroke-linecap="round"/>`).join("");
+    newG.style.opacity = "0";
+    oldG.style.opacity = "0";
+    if (reduced) {
+      drawStatics(toV);
+      newG.style.opacity = "1";
+      oldG.innerHTML = "";
+      return res();
+    }
+    const dur = 640, t0 = performance.now();
+    (function step(now) {
+      const t = easeInOut(Math.min(1, (now - t0) / dur));
+      const p = lerpP(a.p, b.p, t);
+      const ib = a.ib + (b.ib - a.ib) * t;
+      updateVesselArt(p, ib);
+      shadowEl.setAttribute("cy", a.sy + (b.sy - a.sy) * t);
+      shadowEl.setAttribute("rx", a.srx + (b.srx - a.srx) * t);
+      shadowEl.setAttribute("ry", 9);
+      if (t > 0.55) newG.style.opacity = ((t - 0.55) / 0.45).toFixed(2);
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        oldG.innerHTML = "";
+        oldG.style.opacity = "1";
+        newG.style.opacity = "1";
+        drawSteam(b.p.ty);
+        res();
+      }
+    })(t0);
+  });
+}
+
+async function select(i, instant = false) {
+  if (busy || (i === cur && !instant)) return;
+  busy = true;
+  fig.classList.add("busy");
+  fig.classList.remove("broken");
+  const prev = CAFES[cur];
+  cur = i;
+  const c = CAFES[i];
+  updateDock();
+
+  if (instant) {
+    drawStatics(c.vessel);
+    setInfo(c, i);
+    buildSlices(c);
+    pour(c);
+  } else {
+    info.classList.add("out");
+    ghost.classList.add("out");
+    await drain();
+    const morphP = morphVessel(prev.vessel, c.vessel);
+    setTimeout(() => {
+      setInfo(c, i);
+      info.classList.remove("out");
+      ghost.classList.remove("out");
+    }, 300);
+    await morphP;
+    buildSlices(c);
+    pour(c);
+  }
+  setTimeout(() => { busy = false; fig.classList.remove("busy"); }, reduced ? 50 : 900);
+}
+
+/* ================= parallax / tilt ================= */
+const cupSvg = $("cup");
+if (!touchMode && !reduced) {
+  let tx = 0, ty2 = 0, cx2 = 0, cy2 = 0, raf = null;
+  const step = () => {
+    cx2 += (tx - cx2) * 0.09;
+    cy2 += (ty2 - cy2) * 0.09;
+    cupSvg.style.transform = `rotateY(${(cx2 * 5).toFixed(2)}deg) rotateX(${(-cy2 * 4).toFixed(2)}deg)`;
+    ghost.style.transform = `translate(${(-cx2 * 16).toFixed(1)}px, ${(-cy2 * 10).toFixed(1)}px)`;
+    document.querySelectorAll(".par").forEach((el) => {
+      el.style.transform = `translateX(${(cx2 * el.dataset.depth).toFixed(1)}px)`;
+    });
+    if (Math.abs(tx - cx2) > 0.002 || Math.abs(ty2 - cy2) > 0.002) raf = requestAnimationFrame(step);
+    else raf = null;
+  };
+  window.addEventListener("pointermove", (e) => {
+    tx = (e.clientX / innerWidth - 0.5) * 2;
+    ty2 = (e.clientY / innerHeight - 0.5) * 2;
+    if (!raf) raf = requestAnimationFrame(step);
+  });
+}
+
+/* break interaction */
+if (touchMode) {
+  fig.addEventListener("click", () => { if (!busy) fig.classList.toggle("broken"); });
+} else {
+  fig.addEventListener("pointerenter", () => { if (!busy) fig.classList.add("broken"); });
+  fig.addEventListener("pointerleave", () => fig.classList.remove("broken"));
+}
+
+/* keyboard */
+window.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") select((cur + 1) % CAFES.length);
+  if (e.key === "ArrowLeft") select((cur - 1 + CAFES.length) % CAFES.length);
+});
+
+/* ================= dock ================= */
+function dockSVG(vName) {
+  const v = VESSELS[vName];
+  const body = bodyClosed(v.p);
+  const ex = v.extras.map((e) => `<path d="${e.d}" stroke-width="${Math.max(e.w, 9)}"/>`).join("");
+  return `<svg viewBox="100 90 300 410" aria-hidden="true"><path d="${body}"/>${ex}</svg>`;
+}
+function buildDock() {
+  dock.innerHTML = CAFES.map((c, i) =>
+    `<button data-i="${i}" aria-label="${c.name}">${dockSVG(c.vessel)}<span>${c.name}</span></button>`
+  ).join("");
+  dock.querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", () => select(+b.dataset.i));
+  });
+  updateDock();
+}
+function updateDock() {
+  dock.querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === cur));
+}
+
+/* ================= language ================= */
+function applyLang() {
+  const t = UI[lang];
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  document.title = t.docTitle;
+  $("brand").textContent = t.brand;
+  $("hint").textContent = touchMode ? t.hintTouch : t.hint;
+  $("footer").textContent = t.footer;
+  document.querySelectorAll(".langs button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.lang === lang);
+  });
+  const c = CAFES[cur];
+  setInfo(c, cur);
+  buildSlices(c);
+}
+
+$("langs").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b || b.dataset.lang === lang) return;
+  lang = b.dataset.lang;
+  localStorage.setItem("coffee-lang", lang);
+  applyLang();
+});
+
+/* ================= boot ================= */
+buildDock();
+applyLang();
+select(0, true);
+</script>
+</body>
+</html>
