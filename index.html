@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Coffee, from the inside</title>
+<meta name="description" content="An interactive visual guide to coffee drinks. Hover over a cup and it breaks apart into its layers — espresso, milk, foam — with proportions annotated.">
+<meta property="og:title" content="Coffee, from the inside">
+<meta property="og:description" content="Hover over a cup and it breaks apart into its layers. 12 drinks, hand-drawn SVG, no frameworks.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://natti-jpb.github.io/coffee-types-explained/">
+<meta name="theme-color" content="#F6EDDD">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +27,6 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
-  /* warm paper grain */
   body::after {
     content: "";
     position: fixed;
@@ -95,7 +100,7 @@
                 box-shadow .6s cubic-bezier(.22, 1, .36, 1),
                 opacity .5s ease, filter .5s ease;
     animation: fadeUp .8s cubic-bezier(.22, 1, .36, 1) both;
-    animation-delay: calc(var(--i) * 75ms);
+    animation-delay: calc(var(--i) * 60ms);
   }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(26px); }
@@ -106,13 +111,15 @@
     filter: blur(1.6px) saturate(.8);
     transform: scale(.97);
   }
-  .card:hover {
+  .card:is(:hover, :focus-visible, .broken) {
     transform: translateY(-12px) scale(1.06);
     box-shadow: 0 42px 74px -28px rgba(62, 36, 21, .42);
     z-index: 3;
+    opacity: 1;
+    filter: none;
   }
+  .card:focus-visible { outline: 2px solid #A5764C; outline-offset: 4px; }
 
-  /* cursor spotlight */
   .card::after {
     content: "";
     position: absolute;
@@ -124,13 +131,9 @@
     transition: opacity .5s;
     pointer-events: none;
   }
-  .card:hover::after { opacity: 1; }
+  .card:is(:hover, :focus-visible, .broken)::after { opacity: 1; }
 
-  /* warm light behind each cup */
-  .cupbox {
-    position: relative;
-    perspective: 900px;
-  }
+  .cupbox { position: relative; perspective: 900px; }
   .cupbox::before {
     content: "";
     position: absolute;
@@ -154,24 +157,36 @@
   .card h2 {
     font-family: Fraunces, Georgia, serif;
     font-weight: 470;
-    font-size: 23px;
+    font-size: 22px;
     text-align: center;
     margin-top: 8px;
   }
   .card .sub {
     text-align: center;
-    font-size: 11px;
+    font-size: 10.5px;
     letter-spacing: .18em;
     text-transform: uppercase;
     color: #A5764C;
     margin-top: 6px;
   }
 
+  /* proportions bar */
+  .ratio {
+    display: flex;
+    height: 6px;
+    width: 68%;
+    margin: 12px auto 0;
+    border-radius: 99px;
+    overflow: hidden;
+    outline: 1px solid rgba(62, 36, 21, .13);
+  }
+  .ratio i { display: block; height: 100%; }
+
   /* ---- vessel ---- */
   .vessel { transition: opacity .55s ease; }
   .glassBack { transition: opacity .55s ease; }
-  .card:hover .vessel { opacity: .3; }
-  .card:hover .glassBack { opacity: .25; }
+  .card:is(:hover, :focus-visible, .broken) .vessel { opacity: .3; }
+  .card:is(:hover, :focus-visible, .broken) .glassBack { opacity: .25; }
   .outline { fill: none; stroke: #4A2E1B; stroke-linecap: round; stroke-linejoin: round; }
   .extra { fill: none; stroke: #4A2E1B; stroke-linecap: round; }
 
@@ -183,7 +198,7 @@
     transform-box: fill-box;
     transform-origin: center;
   }
-  .card:hover .shadow { opacity: .22; transform: scale(1.14); }
+  .card:is(:hover, :focus-visible, .broken) .shadow { opacity: .22; transform: scale(1.14); }
 
   /* ---- layers ---- */
   .layer {
@@ -192,7 +207,7 @@
     transition: transform .8s cubic-bezier(.3, 1.5, .42, 1) calc(var(--k) * 65ms),
                 filter .6s ease calc(var(--k) * 65ms);
   }
-  .card:hover .layer {
+  .card:is(:hover, :focus-visible, .broken) .layer {
     transform: translateY(calc(var(--k) * -42px)) rotate(var(--rot, 0deg));
     filter: drop-shadow(0 14px 10px rgba(62, 36, 21, .2));
   }
@@ -222,11 +237,11 @@
     flex: none;
   }
   .klbl em { font-style: normal; color: #A5764C; font-weight: 600; margin-left: 2px; }
-  .card:hover .klbl { opacity: 1; transform: none; }
+  .card:is(:hover, :focus-visible, .broken) .klbl { opacity: 1; transform: none; }
 
   /* ---- steam ---- */
   .steam { transition: opacity .35s; }
-  .card:hover .steam { opacity: 0; }
+  .card:is(:hover, :focus-visible, .broken) .steam { opacity: 0; }
   .steam path {
     fill: none;
     stroke: #D9BD9E;
@@ -250,6 +265,8 @@
     font-size: 12px;
     color: #a98a6f;
   }
+  footer a { color: #8a6a4f; text-decoration: none; border-bottom: 1px solid rgba(138,106,79,.35); }
+  footer a:hover { color: #3E2415; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -281,6 +298,18 @@
     </linearGradient>
     <linearGradient id="lg-wtr" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#C08356" stop-opacity=".92"/><stop offset="1" stop-color="#8A5E3B" stop-opacity=".92"/>
+    </linearGradient>
+    <linearGradient id="lg-cnd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6E8CE"/><stop offset="1" stop-color="#E3CBA0"/>
+    </linearGradient>
+    <linearGradient id="lg-wsk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9A05C" stop-opacity=".95"/><stop offset="1" stop-color="#A56F35" stop-opacity=".95"/>
+    </linearGradient>
+    <linearGradient id="lg-cof" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#63401F"/><stop offset="1" stop-color="#331D0E"/>
+    </linearGradient>
+    <linearGradient id="lg-ice" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF8E8"/><stop offset="1" stop-color="#EFDFC0"/>
     </linearGradient>
     <linearGradient id="lg-cyl" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="350" y2="0">
       <stop offset="0" stop-color="#3F2312" stop-opacity=".20"/>
@@ -320,7 +349,7 @@
 
 <main class="grid" id="grid"></main>
 
-<footer id="footer"></footer>
+<footer><span id="footer"></span> · <a href="https://github.com/natti-jpb/coffee-types-explained" target="_blank" rel="noopener">GitHub ↗</a></footer>
 
 <script>
 /* ================= i18n ================= */
@@ -331,6 +360,7 @@ const UI = {
     eyebrow: "a visual guide",
     title: "Coffee, from the inside",
     lead: "Hover over a cup to break it into its layers.",
+    leadTouch: "Tap a cup to break it into its layers.",
     footer: "Approximate proportions — every barista has their own.",
   },
   pt: {
@@ -339,6 +369,7 @@ const UI = {
     eyebrow: "guia visual",
     title: "Os cafés, por dentro",
     lead: "Passe o mouse sobre uma xícara para abrir as camadas.",
+    leadTouch: "Toque numa xícara para abrir as camadas.",
     footer: "Proporções aproximadas — cada barista tem a sua.",
   },
   de: {
@@ -347,35 +378,50 @@ const UI = {
     eyebrow: "ein visueller Leitfaden",
     title: "Kaffee, von innen",
     lead: "Fahre mit der Maus über eine Tasse, um die Schichten zu öffnen.",
+    leadTouch: "Tippe auf eine Tasse, um die Schichten zu öffnen.",
     footer: "Ungefähre Proportionen — jeder Barista hat seine eigenen.",
   },
 };
 
 const ING = {
-  espresso:  { en: "espresso",      pt: "espresso",         de: "Espresso" },
-  crema:     { en: "crema",         pt: "crema",            de: "Crema" },
-  milk:      { en: "steamed milk",  pt: "leite vaporizado", de: "heiße Milch" },
-  foam:      { en: "milk foam",     pt: "espuma de leite",  de: "Milchschaum" },
-  microfoam: { en: "microfoam",     pt: "microespuma",      de: "Mikroschaum" },
-  chocolate: { en: "chocolate",     pt: "chocolate",        de: "Schokolade" },
-  whip:      { en: "whipped cream", pt: "chantilly",        de: "Schlagsahne" },
-  water:     { en: "hot water",     pt: "água quente",      de: "heißes Wasser" },
+  espresso:  { en: "espresso",       pt: "espresso",          de: "Espresso" },
+  crema:     { en: "crema",          pt: "crema",             de: "Crema" },
+  milk:      { en: "steamed milk",   pt: "leite vaporizado",  de: "heiße Milch" },
+  coldmilk:  { en: "cold milk",      pt: "leite gelado",      de: "kalte Milch" },
+  foam:      { en: "milk foam",      pt: "espuma de leite",   de: "Milchschaum" },
+  microfoam: { en: "microfoam",      pt: "microespuma",       de: "Mikroschaum" },
+  chocolate: { en: "chocolate",      pt: "chocolate",         de: "Schokolade" },
+  whip:      { en: "whipped cream",  pt: "chantilly",         de: "Schlagsahne" },
+  water:     { en: "hot water",      pt: "água quente",       de: "heißes Wasser" },
+  condmilk:  { en: "condensed milk", pt: "leite condensado",  de: "Kondensmilch" },
+  whiskey:   { en: "whiskey",        pt: "uísque",            de: "Whiskey" },
+  coffee:    { en: "hot coffee",     pt: "café coado",        de: "heißer Kaffee" },
+  icecream:  { en: "ice cream",      pt: "sorvete",           de: "Vanilleeis" },
 };
 
 const QTY = {
-  top:  { en: "top",    pt: "topo", de: "oben" },
-  veil: { en: "a veil", pt: "véu",  de: "ein Hauch" },
+  top:   { en: "top",     pt: "topo",     de: "oben" },
+  veil:  { en: "a veil",  pt: "véu",      de: "ein Hauch" },
+  dash:  { en: "a dash",  pt: "um toque", de: "ein Schuss" },
+  shot:  { en: "a shot",  pt: "uma dose", de: "ein Shot" },
+  scoop: { en: "a scoop", pt: "uma bola", de: "eine Kugel" },
+  float: { en: "on top",  pt: "por cima", de: "obenauf" },
 };
 
 const FILLS = {
   espresso:  { g: "lg-esp", s: "#55301A", d: "#1F0E07", c: "#3A2114" },
   crema:     { g: "lg-cre", s: "#EFB86D", d: "#A96D2D", c: "#C98A4B", tex: "f-crema" },
   milk:      { g: "lg-mlk", s: "#FAEFE0", d: "#CDB08C", c: "#E9D8C1" },
+  coldmilk:  { g: "lg-mlk", s: "#FAEFE0", d: "#CDB08C", c: "#EDDECA" },
   foam:      { g: "lg-fom", s: "#FFFAF0", d: "#E3D0B0", c: "#F6EDDE", tex: "f-foam" },
   microfoam: { g: "lg-fom", s: "#FFFAF0", d: "#E3D0B0", c: "#F6EDDE", tex: "f-foam" },
   chocolate: { g: "lg-cho", s: "#8F5229", d: "#3E1F0C", c: "#6B3A21" },
   whip:      { g: "lg-whp", s: "#FFFDF6", d: "#E8D9BE", c: "#FBF4E6", tex: "f-foam" },
   water:     { g: "lg-wtr", s: "#C08C64", d: "#7C5636", c: "#A5754F", op: .9 },
+  condmilk:  { g: "lg-cnd", s: "#F8EDD8", d: "#D8BF97", c: "#F0E0BF" },
+  whiskey:   { g: "lg-wsk", s: "#D29A57", d: "#8F5E2C", c: "#C68B4A", op: .95 },
+  coffee:    { g: "lg-cof", s: "#5E3A20", d: "#26150B", c: "#4E2E18" },
+  icecream:  { g: "lg-ice", s: "#FFF9EA", d: "#E4D2AE", c: "#FBF3E0", tex: "f-foam" },
 };
 
 /* ================= drinks ================= */
@@ -402,6 +448,14 @@ const CAFES = [
     layers: [
       { i: "espresso", f: 0.50, q: "1/2" },
       { i: "milk", f: 0.50, q: "1/2" },
+    ],
+  },
+  {
+    id: "bombon", name: "Café Bombón", vessel: "shotglass", fill: 0.62,
+    sub: { en: "sweetness in layers", pt: "doçura em camadas", de: "Süße in Schichten" },
+    layers: [
+      { i: "condmilk", f: 0.50, q: "1/2" },
+      { i: "espresso", f: 0.50, q: "1/2" },
     ],
   },
   {
@@ -449,12 +503,36 @@ const CAFES = [
       { i: "water", f: 2 / 3, q: "2/3" },
     ],
   },
+  {
+    id: "irish", name: "Irish Coffee", vessel: "irishglass", fill: 0.88,
+    sub: { en: "a toast in a glass", pt: "um brinde em copo", de: "ein Toast im Glas" },
+    layers: [
+      { i: "whiskey", f: 0.18, q: "dash" },
+      { i: "coffee", f: 0.60, q: "2/3" },
+      { i: "whip", f: 0.22, q: "float" },
+    ],
+  },
+  {
+    id: "affogato", name: "Affogato", vessel: "coupe", fill: 0.80, noSteam: true,
+    sub: { en: "dessert, drowned", pt: "sobremesa afogada", de: "ertränktes Dessert" },
+    layers: [
+      { i: "espresso", f: 0.45, q: "shot" },
+      { i: "icecream", f: 0.55, q: "scoop" },
+    ],
+  },
+  {
+    id: "icedlatte", name: "Iced Latte", vessel: "tumbler", fill: 0.90, noSteam: true, drops: true,
+    sub: { en: "cool and creamy", pt: "gelado e cremoso", de: "kühl und cremig" },
+    layers: [
+      { i: "coldmilk", f: 0.62, q: "3/5" },
+      { i: "espresso", f: 0.38, q: "2/5" },
+    ],
+  },
 ];
 
 /* ================= vessels ================= */
 const CX = 240;
 const RY = 0.16;
-/* card viewBox */
 const VB = { x: 56, y: 16, w: 524, h: 546 };
 
 const VESSELS = {
@@ -519,6 +597,30 @@ const VESSELS = {
       { d: `M${CX + 96} 232 C${CX + 164} 228 ${CX + 164} 344 ${CX + 94} 340`, w: 16 },
     ],
   },
+  irishglass: {
+    p: { ty: 176, tw: 86, c1x: 84, c1y: 240, c2x: 56, c2y: 316, bw: 42, by: 352, r: 10 },
+    ib: 6, lx: 380, sy: 452, srx: 72,
+    extras: [
+      { d: `M${CX} 352 L${CX} 398`, w: 11 },
+      { d: `M${CX - 46} 404 Q${CX} 392 ${CX + 46} 404 Q${CX} 416 ${CX - 46} 404 Z`, w: 4 },
+      { d: `M${CX + 84} 210 C${CX + 126} 208 ${CX + 126} 262 ${CX + 74} 264`, w: 10 },
+    ],
+  },
+  coupe: {
+    p: { ty: 252, tw: 112, c1x: 106, c1y: 300, c2x: 76, c2y: 344, bw: 48, by: 368, r: 12 },
+    ib: 6, lx: 386, sy: 452, srx: 108,
+    extras: [
+      { d: `M${CX} 368 L${CX} 404`, w: 11 },
+      { d: `M${CX - 46} 410 Q${CX} 398 ${CX + 46} 410 Q${CX} 422 ${CX - 46} 410 Z`, w: 4 },
+    ],
+  },
+  tumbler: {
+    p: { ty: 130, tw: 80, c1x: 78, c1y: 230, c2x: 74, c2y: 340, bw: 70, by: 428, r: 12 },
+    ib: 9, lx: 334, sy: 446, srx: 88,
+    extras: [
+      { d: `M${CX - 54} 415 L${CX + 54} 415`, w: 2.5 },
+    ],
+  },
 };
 
 /* ================= geometry ================= */
@@ -565,7 +667,7 @@ function halfAt(p, y) {
   return cubicAt(p.tw, p.c1x, p.c2x, p.bw, t);
 }
 
-/* ================= garnish ================= */
+/* ================= garnish (squashed, on liquid surface) ================= */
 const COCOA = [[-.55,.2],[-.3,-.4],[-.1,.5],[.15,-.25],[.4,.35],[.62,-.1],[-.7,-.08],[.05,.1],[.3,-.55],[-.45,-.6],[.65,.45],[-.2,.05],[.5,.62],[-.62,.55],[.76,.18],[-.05,-.66]];
 
 function garnish(id, rx) {
@@ -584,6 +686,8 @@ function garnish(id, rx) {
     case "cortado":
       return `<ellipse rx="${R*.72}" ry="${R*.72}" fill="none" stroke="#D9A968" stroke-width="3" opacity=".5"/>` +
         `<ellipse rx="${R*.4}" ry="${R*.4}" fill="none" stroke="#D9A968" stroke-width="2" opacity=".35"/>`;
+    case "bombon":
+      return `<ellipse rx="${R*.66}" ry="${R*.66}" fill="none" stroke="#EFB86D" stroke-width="2.6" opacity=".55"/>`;
     case "flatwhite": {
       let s = `<path d="M0 ${-R*.66} L0 ${R*.66}" stroke="#C98A4B" stroke-width="2.6" fill="none" opacity=".5"/>`;
       [-.42, -.08, .26, .58].forEach((yy) => {
@@ -607,8 +711,52 @@ function garnish(id, rx) {
         fill="none" stroke="#C08C64" stroke-width="2.6" opacity=".5"/>` +
         `<circle cx="${R*.3}" cy="${R*.3}" r="2.4" fill="#C08C64" opacity=".45"/>` +
         `<circle cx="${-R*.15}" cy="${R*.42}" r="1.8" fill="#C08C64" opacity=".4"/>`;
+    case "irish":
+      return `<path d="M${-R*.5} 0 C${-R*.2} ${-R*.35} ${R*.2} ${R*.35} ${R*.5} 0"
+        fill="none" stroke="#E8D9BE" stroke-width="2.6" opacity=".7"/>`;
     default: return "";
   }
+}
+
+/* toppers (unsquashed, sit on the top slice) */
+function topper(id, y, surfRx) {
+  if (id === "icedlatte") {
+    const cube = (tx, ty2, rot, s) =>
+      `<g transform="translate(${tx} ${ty2}) rotate(${rot})">
+        <rect x="${-s}" y="${-s}" width="${s*2}" height="${s*2}" rx="${s*.36}"
+          fill="rgba(255,255,255,.38)" stroke="rgba(255,255,255,.9)" stroke-width="2"/>
+        <path d="M${-s*.4} ${-s*.35} L${s*.3} ${-s*.6}" stroke="rgba(255,255,255,.85)" stroke-width="1.5" fill="none"/>
+      </g>`;
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">
+      ${cube(-26, -7, -14, 13)}${cube(20, -4, 10, 11)}${cube(-2, 4, 24, 9)}
+    </g>`;
+  }
+  if (id === "affogato") {
+    const R = surfRx * 0.58;
+    const dome = `M${-R} 2 Q${-R*1.02} -30 ${-R*.5} -38 Q${-R*.42} -52 ${-R*.05} -48
+        Q${R*.2} -58 ${R*.45} -44 Q${R*1.0} -38 ${R} 2 Z`;
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">
+      <path d="${dome}" fill="#F6EBD2"/>
+      <path d="${dome}" fill="url(#lg-ice)" opacity=".85"/>
+      <path d="${dome}" fill="#fff" filter="url(#f-foam)" opacity=".5"/>
+      <path d="${dome}" fill="none" stroke="#4A2E1B" stroke-width="2" opacity=".4"/>
+      <path d="M${-R*.72} -14 Q${-R*.3} -30 ${R*.1} -20" fill="none" stroke="#D8BF97" stroke-width="2.4" opacity=".6"/>
+      <ellipse cx="${-R*.32}" cy="-30" rx="${R*.26}" ry="8" fill="#FFFFFF" opacity=".6"/>
+    </g>`;
+  }
+  return "";
+}
+
+/* condensation droplets for cold drinks (drawn with the vessel) */
+function dropsSVG() {
+  return `<g>
+    <circle cx="${CX - 58}" cy="262" r="3" fill="rgba(255,255,255,.55)"/>
+    <circle cx="${CX - 68}" cy="322" r="2.2" fill="rgba(255,255,255,.5)"/>
+    <circle cx="${CX + 62}" cy="242" r="2.6" fill="rgba(255,255,255,.55)"/>
+    <circle cx="${CX + 68}" cy="352" r="3.2" fill="rgba(255,255,255,.5)"/>
+    <circle cx="${CX - 52}" cy="384" r="2" fill="rgba(255,255,255,.45)"/>
+    <path d="M${CX + 64} 298 q2 11 0 19" stroke="rgba(255,255,255,.5)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+  </g>`;
 }
 
 /* ================= card svg ================= */
@@ -639,7 +787,9 @@ function slicesSVG(c) {
     const tex = fill.tex
       ? `<rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="#fff" filter="url(#${fill.tex})" opacity=".5"/>` : "";
     const gar = k === n - 1
-      ? `<g transform="translate(${CX} ${y.toFixed(1)}) scale(1 ${RY})" style="filter:blur(.4px)">${garnish(c.id, surfRx)}</g>` : "";
+      ? `<g transform="translate(${CX} ${y.toFixed(1)}) scale(1 ${RY})" style="filter:blur(.4px)">${garnish(c.id, surfRx)}</g>` +
+        topper(c.id, y, surfRx)
+      : "";
     return `<g class="layer" style="--k:${k};--rot:${rot}deg">
       <g clip-path="url(#int-${c.id})">
         <ellipse cx="${CX}" cy="${(y + h).toFixed(1)}" rx="${botRx.toFixed(1)}" ry="${(botRx * RY).toFixed(1)}" fill="${fill.d}"${op}/>
@@ -659,6 +809,11 @@ function cupSVG(c) {
   const p = v.p;
   const h = p.by - p.ty;
   const steamY = p.ty - 20;
+  const steam = c.noSteam ? "" : `<g class="steam">
+      <path d="M${CX - 18} ${steamY} C${CX - 28} ${steamY - 20} ${CX - 8} ${steamY - 36} ${CX - 18} ${steamY - 60}"/>
+      <path d="M${CX + 16} ${steamY + 4} C${CX + 6} ${steamY - 16} ${CX + 26} ${steamY - 32} ${CX + 16} ${steamY - 56}"/>
+      <path d="M${CX - 1} ${steamY - 8} C${CX - 9} ${steamY - 26} ${CX + 7} ${steamY - 40} ${CX - 1} ${steamY - 64}"/>
+    </g>`;
   const sheen =
     `<path d="M${CX - p.tw * 0.62} ${p.ty + 26} C${CX - p.tw * 0.74} ${p.ty + h * 0.42} ${CX - p.bw * 0.78} ${p.by - h * 0.3} ${CX - p.bw * 0.52} ${p.by - 24}"
        fill="none" stroke="rgba(255,255,255,.5)" stroke-width="8" stroke-linecap="round" style="filter:blur(2.5px)"/>` +
@@ -668,15 +823,12 @@ function cupSVG(c) {
        fill="none" stroke="rgba(255,255,255,.4)" stroke-width="5" stroke-linecap="round" style="filter:blur(2px)"/>`;
   const extras = v.extras.map((e) =>
     `<path class="extra" d="${e.d}" stroke-width="${e.w}"/>`).join("");
+  const drops = c.drops ? dropsSVG() : "";
 
   return `<svg viewBox="${VB.x} ${VB.y} ${VB.w} ${VB.h}" role="img" aria-label="${c.name}">
     <defs><clipPath id="int-${c.id}"><path d="${bodyClosed(innerParams(p, v.ib))}"/></clipPath></defs>
     <ellipse class="shadow" cx="${CX}" cy="${v.sy}" rx="${v.srx}" ry="9"/>
-    <g class="steam">
-      <path d="M${CX - 18} ${steamY} C${CX - 28} ${steamY - 20} ${CX - 8} ${steamY - 36} ${CX - 18} ${steamY - 60}"/>
-      <path d="M${CX + 16} ${steamY + 4} C${CX + 6} ${steamY - 16} ${CX + 26} ${steamY - 32} ${CX + 16} ${steamY - 56}"/>
-      <path d="M${CX - 1} ${steamY - 8} C${CX - 9} ${steamY - 26} ${CX + 7} ${steamY - 40} ${CX - 1} ${steamY - 64}"/>
-    </g>
+    ${steam}
     <path class="glassBack" d="${bodyClosed(p)}" fill="rgba(255,250,242,.30)"/>
     <g class="slices">${slicesSVG(c)}</g>
     <g class="vessel">
@@ -684,11 +836,11 @@ function cupSVG(c) {
       <path class="outline" d="${bodyOpen(p)}" stroke-width="3"/>
       ${sheen}
       <ellipse fill="none" stroke="#4A2E1B" stroke-width="3" cx="${CX}" cy="${p.ty}" rx="${p.tw}" ry="${Math.max(6, p.tw * 0.14)}"/>
+      ${drops}
     </g>
   </svg>`;
 }
 
-/* HTML labels positioned at the broken (exploded) slice centers */
 function labelsHTML(c) {
   const v = VESSELS[c.vessel];
   return sliceGeom(c).map(({ L, k, yc }) => {
@@ -697,6 +849,14 @@ function labelsHTML(c) {
     const left = ((v.lx - VB.x) / VB.w * 100).toFixed(2);
     return `<div class="klbl" style="--k:${k};top:${top}%;left:${left}%">${ING[L.i][lang]} <em>· ${qty(L.q)}</em></div>`;
   }).join("");
+}
+
+function ratioHTML(c) {
+  return `<div class="ratio">` + c.layers.map((L) => {
+    const f = FILLS[L.i];
+    const opacity = f.op ? `;opacity:${f.op}` : "";
+    return `<i style="width:${(L.f * 100).toFixed(1)}%;background:${f.c}${opacity}" title="${ING[L.i][lang]}"></i>`;
+  }).join("") + `</div>`;
 }
 
 /* ================= tilt & spotlight ================= */
@@ -733,6 +893,7 @@ function attachTilt(card) {
 /* ================= render ================= */
 const $ = (id) => document.getElementById(id);
 const grid = $("grid");
+const touchMode = matchMedia("(hover: none)").matches;
 let lang = localStorage.getItem("coffee-lang") || "en";
 if (!UI[lang]) lang = "en";
 
@@ -743,7 +904,7 @@ function render() {
   $("brand").textContent = t.brand;
   $("eyebrow").textContent = t.eyebrow;
   $("title").textContent = t.title;
-  $("lead").textContent = t.lead;
+  $("lead").textContent = touchMode ? t.leadTouch : t.lead;
   $("footer").textContent = t.footer;
 
   grid.innerHTML = "";
@@ -751,15 +912,29 @@ function render() {
     const card = document.createElement("article");
     card.className = "card";
     card.style.setProperty("--i", i);
+    card.tabIndex = 0;
+    card.setAttribute("aria-label", c.name);
     card.innerHTML =
       `<div class="cupbox">${cupSVG(c)}${labelsHTML(c)}</div>` +
-      `<h2>${c.name}</h2><p class="sub">${c.sub[lang]}</p>`;
+      `<h2>${c.name}</h2><p class="sub">${c.sub[lang]}</p>` +
+      ratioHTML(c);
     grid.appendChild(card);
     attachTilt(card);
   });
 
   document.querySelectorAll(".langs button").forEach((b) => {
     b.classList.toggle("on", b.dataset.lang === lang);
+  });
+}
+
+/* touch: tap toggles the break-apart */
+if (touchMode) {
+  grid.addEventListener("click", (e) => {
+    const card = e.target.closest(".card");
+    if (!card) return;
+    const was = card.classList.contains("broken");
+    document.querySelectorAll(".card.broken").forEach((x) => x.classList.remove("broken"));
+    if (!was) card.classList.add("broken");
   });
 }
 
