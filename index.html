@@ -716,7 +716,7 @@ const CAFES = [
     ],
   },
   {
-    id: "einspaenner", name: "Einspänner", vessel: "henkel", fill: 0.90,
+    id: "einspaenner", name: "Einspänner", vessel: "henkel", fill: 0.90, cloudTop: true,
     sub: { en: "vienna in a glass", pt: "viena num copo", de: "der Wiener Klassiker" },
     layers: [
       { i: "espresso", f: 0.55, q: "dbl" },
@@ -752,12 +752,12 @@ const CAFES = [
     id: "icedlatte", name: "Iced Latte", vessel: "tumbler", fill: 0.90, noSteam: true, drops: true,
     sub: { en: "cool and creamy", pt: "gelado e cremoso", de: "kühl und cremig" },
     layers: [
-      { i: "coldmilk", f: 0.62, q: "3/5" },
-      { i: "espresso", f: 0.38, q: "2/5" },
+      { i: "coldmilk", f: 0.62, q: "3/5", ice: [[-24, .22, 12, -12], [19, .38, 10, 16]] },
+      { i: "espresso", f: 0.38, q: "2/5", ice: [[-15, .45, 11, 18], [14, .6, 8.5, -14]] },
     ],
   },
   {
-    id: "dalgona", name: "Dalgona", vessel: "tumbler", fill: 0.88, noSteam: true, drops: true,
+    id: "dalgona", name: "Dalgona", vessel: "tumbler", fill: 0.88, noSteam: true, drops: true, cloudTop: true,
     sub: { en: "the whipped one", pt: "o café batido", de: "der Aufgeschlagene" },
     layers: [
       { i: "coldmilk", f: 0.70, q: "2/3" },
@@ -768,8 +768,8 @@ const CAFES = [
     id: "espressotonic", name: "Espresso Tonic", vessel: "highball", fill: 0.90, noSteam: true, drops: true, deco: "lemon",
     sub: { en: "bright and bubbly", pt: "cítrico e borbulhante", de: "prickelnd und frisch" },
     layers: [
-      { i: "tonic", f: 0.68, q: "2/3" },
-      { i: "espresso", f: 0.32, q: "1/3" },
+      { i: "tonic", f: 0.68, q: "2/3", ice: [[-18, .32, 11, 10], [15, .58, 10, -18]] },
+      { i: "espresso", f: 0.32, q: "1/3", ice: [[-2, .5, 10, 12]] },
     ],
   },
   {
@@ -1081,47 +1081,29 @@ function garnish(id, rx) {
   }
 }
 
-/* toppers (unsquashed, sit on the top slice) */
-function whipDome(surfRx, scale, fill, edge, tex) {
-  const R = surfRx * scale;
-  const t1 = `M${-R} 3 Q${-R*1.05} -13 ${-R*.6} -17 Q0 -27 ${R*.6} -17 Q${R*1.05} -13 ${R} 3 Z`;
-  const t2 = `M${-R*.68} -11 Q${-R*.74} -28 ${-R*.3} -32 Q0 -38 ${R*.32} -31 Q${R*.72} -26 ${R*.62} -11 Q0 -21 ${-R*.68} -11 Z`;
-  const t3 = `M${-R*.26} -26 Q${-R*.3} -42 ${-R*.02} -46 Q${R*.2} -48 ${R*.15} -37 Q${R*.3} -38 ${R*.22} -27 Q0 -34 ${-R*.26} -26 Z`;
-  return `
-    <path d="${t1}" fill="${fill}" stroke="${edge}" stroke-width="1.2" stroke-opacity=".45"/>
-    <path d="${t2}" fill="${fill}" stroke="${edge}" stroke-width="1.1" stroke-opacity=".4"/>
-    <path d="${t3}" fill="${fill}" stroke="${edge}" stroke-width="1" stroke-opacity=".4"/>
-    <path d="${t1}" fill="#fff" filter="url(#${tex})" opacity=".35"/>
-    <path d="M${-R*.02} -46 Q${-R*.12} -55 ${-R*.28} -51" fill="none" stroke="${edge}" stroke-width="2.4" stroke-linecap="round" opacity=".75"/>
-    <ellipse cx="${-R*.36}" cy="-19" rx="${R*.2}" ry="5.5" fill="#FFFFFF" opacity=".5"/>
-    <ellipse cx="${-R*.12}" cy="-37" rx="${R*.11}" ry="4" fill="#FFFFFF" opacity=".55"/>`;
+/* mounded cream top (dalgona / einspänner) — replaces the flat surface */
+function cloudTop(c, y, rx) {
+  const dal = c.id === "dalgona";
+  const fill = dal ? "url(#lg-dal)" : "url(#lg-whp)";
+  const edge = dal ? "#A97731" : "#CDB88F";
+  const tex = dal ? "f-crema" : "f-foam";
+  const puff = (px, py, prx, pry) =>
+    `<ellipse cx="${px.toFixed(1)}" cy="${py}" rx="${prx.toFixed(1)}" ry="${pry}" fill="${fill}"/>` +
+    `<ellipse cx="${px.toFixed(1)}" cy="${py}" rx="${prx.toFixed(1)}" ry="${pry}" fill="#fff" filter="url(#${tex})" opacity=".3"/>`;
+  return `<g transform="translate(${CX} ${y.toFixed(1)})">
+    <ellipse rx="${rx.toFixed(1)}" ry="${(rx * RY).toFixed(1)}" fill="${fill}"/>
+    ${puff(-rx * .5, -6, rx * .4, 13)}
+    ${puff(rx * .46, -5, rx * .38, 11)}
+    ${puff(-rx * .02, -10, rx * .52, 16)}
+    <path d="M${(-rx * .78).toFixed(1)} -2 Q${(-rx * .55).toFixed(1)} -17 ${(-rx * .18).toFixed(1)} -17"
+      fill="none" stroke="${edge}" stroke-width="1.4" opacity=".35"/>
+    <path d="M${(rx * .2).toFixed(1)} -18 Q${(rx * .52).toFixed(1)} -17 ${(rx * .74).toFixed(1)} -3"
+      fill="none" stroke="${edge}" stroke-width="1.4" opacity=".3"/>
+    <ellipse cx="${(-rx * .18).toFixed(1)}" cy="-13" rx="${(rx * .2).toFixed(1)}" ry="4.5" fill="#FFFFFF" opacity=".5"/>
+  </g>`;
 }
 
 function topper(id, y, surfRx) {
-  if (id === "dalgona") {
-    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .52, "url(#lg-dal)", "#A97731", "f-crema")}</g>`;
-  }
-  if (id === "einspaenner") {
-    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .55, "url(#lg-whp)", "#CDB88F", "f-foam")}</g>`;
-  }
-  if (id === "icedlatte" || id === "espressotonic") {
-    const cube = (tx, ty2, rot, s, op) =>
-      `<g transform="translate(${tx} ${ty2}) rotate(${rot})" opacity="${op}">
-        <rect x="${-s}" y="${-s}" width="${s*2}" height="${s*2}" rx="${(s*.3).toFixed(1)}"
-          fill="url(#lg-cube)" stroke="rgba(255,255,255,.85)" stroke-width="1.5"/>
-        <path d="M${-s*.5} ${s*.45} L${s*.45} ${-s*.5}" stroke="rgba(255,255,255,.55)"
-          stroke-width="${(s*.3).toFixed(1)}" stroke-linecap="round"/>
-        <path d="M${-s*.62} ${-s*.62} L${-s*.05} ${-s*.62}" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" opacity=".95"/>
-        <path d="M${-s+1.5} ${s-2.5} Q0 ${s+1.5} ${s-1.5} ${s-2.5}" stroke="rgba(110,75,40,.16)" stroke-width="1.6" fill="none"/>
-      </g>`;
-    const sparkle = (sx, sy) =>
-      `<path d="M${sx} ${sy-3.4} L${sx} ${sy+3.4} M${sx-3.4} ${sy} L${sx+3.4} ${sy}"
-        stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".85"/>`;
-    return `<g transform="translate(${CX} ${y.toFixed(1)})">
-      ${cube(-25, -9, -12, 13.5, 1)}${cube(21, -5, 9, 11, .95)}${cube(-3, 6, 26, 8.5, .8)}
-      ${sparkle(-38, -20)}${sparkle(33, -16)}
-    </g>`;
-  }
   if (id === "affogato") {
     const R = surfRx * 0.58;
     const dome = `M${-R} 2 Q${-R*1.02} -30 ${-R*.5} -38 Q${-R*.42} -52 ${-R*.05} -48
@@ -1187,6 +1169,15 @@ function slicesSVG(c) {
       fx = [-42, -26, -8, 12, 30].map((dx) =>
         `<path d="M${CX + dx} ${(y + 10).toFixed(1)} V${(y + h - 12).toFixed(1)}" stroke="rgba(225,195,155,.13)" stroke-width="3"/>`).join("");
     }
+    const ice = (L.ice || []).map(([dx, fy, s2, rot]) =>
+      `<g transform="translate(${CX + dx} ${(y + h * fy).toFixed(1)}) rotate(${rot})">
+        <rect x="${-s2}" y="${-s2}" width="${s2 * 2}" height="${s2 * 2}" rx="${(s2 * .3).toFixed(1)}"
+          fill="url(#lg-cube)" stroke="rgba(196,218,232,.95)" stroke-width="2"/>
+        <path d="M${(-s2 * .45).toFixed(1)} ${(-s2 * .45).toFixed(1)} L${(s2 * .2).toFixed(1)} ${(-s2 * .45).toFixed(1)}"
+          stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>
+        <path d="M${(-s2 + 2).toFixed(1)} ${(s2 - 2).toFixed(1)} Q0 ${(s2 + 1).toFixed(1)} ${(s2 - 2).toFixed(1)} ${(s2 - 2).toFixed(1)}"
+          stroke="rgba(100,70,40,.15)" stroke-width="1.4" fill="none"/>
+      </g>`).join("");
     const gar = k === n - 1
       ? `<g transform="translate(${CX} ${y.toFixed(1)}) scale(1 ${RY})" style="filter:blur(.4px)">${garnish(c.id, surfRx)}</g>` +
         topper(c.id, y, surfRx)
@@ -1196,10 +1187,12 @@ function slicesSVG(c) {
         <ellipse cx="${CX}" cy="${(y + h).toFixed(1)}" rx="${botRx.toFixed(1)}" ry="${(botRx * RY).toFixed(1)}" fill="${fill.d}"${op}/>
         <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#${fill.g})"/>
         <rect x="120" y="${y.toFixed(1)}" width="240" height="${(h + 0.6).toFixed(1)}" fill="url(#lg-cyl)"/>
-        ${tex}${fx}
+        ${tex}${fx}${ice}
       </g>
-      <ellipse cx="${CX}" cy="${y.toFixed(1)}" rx="${surfRx.toFixed(1)}" ry="${(surfRx * RY).toFixed(1)}" fill="${fill.s}"${op}/>
-      <ellipse cx="${CX - surfRx * .3}" cy="${(y - surfRx * RY * .25).toFixed(1)}" rx="${(surfRx * .42).toFixed(1)}" ry="${(surfRx * RY * .4).toFixed(1)}" fill="#FFFFFF" opacity=".18"/>
+      ${c.cloudTop && k === n - 1
+        ? cloudTop(c, y, surfRx)
+        : `<ellipse cx="${CX}" cy="${y.toFixed(1)}" rx="${surfRx.toFixed(1)}" ry="${(surfRx * RY).toFixed(1)}" fill="${fill.s}"${op}/>
+      <ellipse cx="${CX - surfRx * .3}" cy="${(y - surfRx * RY * .25).toFixed(1)}" rx="${(surfRx * .42).toFixed(1)}" ry="${(surfRx * RY * .4).toFixed(1)}" fill="#FFFFFF" opacity=".18"/>`}
       ${gar}
     </g>`;
   }).join("");
