@@ -6,7 +6,8 @@ Pure HTML + CSS + JS. No frameworks, no build step.
 
 ## Features
 
-- **12 drinks**, each in its real vessel: espresso in a demitasse, cortado in a gibraltar glass, latte in a tall footed glass, irish coffee in a footed goblet, affogato in a coupe (with an ice-cream scoop), iced latte in a cold tumbler with floating ice cubes and condensation…
+- **16 drinks**, each in its real vessel: espresso in a demitasse, cortado in a gibraltar glass, latte in a tall footed glass, irish coffee in a footed goblet, affogato in a coupe (with an ice-cream scoop), iced latte and dalgona in cold tumblers, espresso tonic in a highball (bubbles + lemon wheel), einspänner in a handled glass, nitro cold brew poured like a stout…
+- **Trait icons** on every card: hot/iced, intensity (beans) and sweetness (sugar cubes)
 - **Appetizing volumetric rendering** — hand-drawn SVG with elliptical liquid surfaces, crema/foam textures (procedural turbulence), glass sheen, warm light, animated steam, and barista details on top (cocoa dust, latte-art heart, rosetta, chocolate drizzle)
 - **Break-apart interaction** — layers float up as creamy discs with spring easing, labels draw in, siblings blur out; 3D tilt and cursor spotlight
 - **Proportion bars** on every card for a glanceable recipe
