@@ -6,11 +6,12 @@ Pure HTML + CSS + JS. No frameworks, no build step.
 
 ## Features
 
-- **8 drinks**, each in its real vessel: espresso in a demitasse, cortado in a gibraltar glass, latte in a tall footed glass, mochaccino in a stemmed glass…
+- **12 drinks**, each in its real vessel: espresso in a demitasse, cortado in a gibraltar glass, latte in a tall footed glass, irish coffee in a footed goblet, affogato in a coupe (with an ice-cream scoop), iced latte in a cold tumbler with floating ice cubes and condensation…
 - **Appetizing volumetric rendering** — hand-drawn SVG with elliptical liquid surfaces, crema/foam textures (procedural turbulence), glass sheen, warm light, animated steam, and barista details on top (cocoa dust, latte-art heart, rosetta, chocolate drizzle)
 - **Break-apart interaction** — layers float up as creamy discs with spring easing, labels draw in, siblings blur out; 3D tilt and cursor spotlight
+- **Proportion bars** on every card for a glanceable recipe
 - **i18n** — English by default, Português (BR) and Deutsch via the top-right switcher
-- Keyboard/touch friendly, respects `prefers-reduced-motion`
+- Keyboard accessible (tab + focus breaks the cup), touch support (tap toggles), respects `prefers-reduced-motion`
 
 ## Run locally
 
