@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffee, from the inside</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #F4ECDF;
+    background-image:
+      radial-gradient(circle at 18% -12%, #FCF7ED 0%, transparent 55%),
+      radial-gradient(circle at 105% 110%, #EDE0CC 0%, transparent 45%);
+    color: #3E2415;
+    font-family: Inter, system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 34px;
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .brand { color: #8a6a4f; }
+  .langs { display: flex; gap: 6px; }
+  .langs button {
+    font: 600 11px Inter, sans-serif;
+    letter-spacing: .14em;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    color: #a98660;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color .25s, border-color .25s, background .25s;
+  }
+  .langs button:hover { color: #3E2415; }
+  .langs button.on {
+    color: #3E2415;
+    border-color: rgba(62, 36, 21, .25);
+    background: rgba(255, 253, 247, .7);
+  }
+
+  header { text-align: center; padding: 38px 20px 10px; }
+  .eyebrow { font-size: 11px; letter-spacing: .36em; text-transform: uppercase; color: #A5764C; }
+  h1 {
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-weight: 380;
+    font-size: clamp(42px, 6vw, 74px);
+    line-height: 1.05;
+    margin: 12px 0 14px;
+  }
+  .lead { color: #7d5f46; font-size: 15px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(258px, 1fr));
+    gap: 22px;
+    max-width: 1220px;
+    margin: 38px auto 70px;
+    padding: 0 28px;
+  }
+
+  .card {
+    background: #FFFDF7;
+    border: 1px solid rgba(62, 36, 21, .07);
+    border-radius: 24px;
+    padding: 20px 12px 24px;
+    position: relative;
+    transition: transform .6s cubic-bezier(.22, 1, .36, 1),
+                box-shadow .6s cubic-bezier(.22, 1, .36, 1),
+                opacity .5s ease, filter .5s ease;
+    animation: fadeUp .8s cubic-bezier(.22, 1, .36, 1) both;
+    animation-delay: calc(var(--i) * 75ms);
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(26px); }
+    to { opacity: 1; transform: none; }
+  }
+  .grid:hover .card:not(:hover) {
+    opacity: .38;
+    filter: blur(1.6px) saturate(.75);
+    transform: scale(.968);
+  }
+  .card:hover {
+    transform: translateY(-12px) scale(1.07);
+    box-shadow: 0 40px 70px -26px rgba(62, 36, 21, .40);
+    z-index: 3;
+  }
+
+  /* cursor spotlight */
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 40%),
+                rgba(201, 138, 75, .10), transparent 65%);
+    opacity: 0;
+    transition: opacity .5s;
+    pointer-events: none;
+  }
+  .card:hover::after { opacity: 1; }
+
+  .tilt { will-change: transform; }
+  .card svg { display: block; width: 100%; max-width: 280px; margin: 0 auto; overflow: visible; }
+
+  .card h2 {
+    font-family: Fraunces, Georgia, serif;
+    font-weight: 470;
+    font-size: 23px;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .card .sub {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #A5764C;
+    margin-top: 6px;
+  }
+
+  /* ---- vessel ---- */
+  .vessel path, .vessel ellipse, .vessel line {
+    fill: none;
+    stroke: #3E2415;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: opacity .55s ease;
+  }
+  .card:hover .vessel { opacity: .26; }
+  .vessel { transition: opacity .55s ease; }
+
+  .shadow {
+    fill: #3E2415;
+    opacity: .07;
+    transition: opacity .6s, transform .6s cubic-bezier(.22, 1, .36, 1);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .card:hover .shadow { opacity: .11; transform: scale(1.12); }
+
+  /* ---- layers ---- */
+  .layer {
+    transition: transform .7s cubic-bezier(.3, 1.45, .4, 1) calc(var(--k) * 55ms),
+                filter .6s ease calc(var(--k) * 55ms);
+  }
+  .card:hover .layer {
+    transform: translateY(calc(var(--k) * -21px));
+    filter: drop-shadow(0 9px 7px rgba(62, 36, 21, .16));
+  }
+
+  .lbl line {
+    stroke: #B08A63;
+    stroke-width: 1.2;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset .4s ease;
+  }
+  .lbl text {
+    font: 500 11px Inter, sans-serif;
+    fill: #6b4a33;
+    letter-spacing: .02em;
+    opacity: 0;
+    transform: translateX(-7px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .card:hover .lbl line {
+    stroke-dashoffset: 0;
+    transition-delay: calc(var(--k) * 55ms + .18s);
+  }
+  .card:hover .lbl text {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--k) * 55ms + .26s);
+  }
+
+  /* ---- steam ---- */
+  .steam { transition: opacity .35s; }
+  .card:hover .steam { opacity: 0; }
+  .steam path {
+    fill: none;
+    stroke: #C9A987;
+    stroke-width: 2;
+    stroke-linecap: round;
+    filter: blur(.7px);
+    opacity: 0;
+    animation: steam 3.6s ease-in-out infinite;
+  }
+  .steam path:nth-child(2) { animation-delay: 1.2s; animation-duration: 4.2s; }
+  .steam path:nth-child(3) { animation-delay: 2.3s; animation-duration: 3.9s; }
+  @keyframes steam {
+    0%, 100% { opacity: 0; transform: translateY(6px); }
+    35% { opacity: .55; }
+    75% { opacity: .08; transform: translateY(-9px); }
+  }
+
+  footer {
+    text-align: center;
+    padding: 0 20px 46px;
+    font-size: 12px;
+    color: #a98a6f;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- shared gradients & patterns -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-esp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#48291A"/><stop offset="1" stop-color="#2C170F"/>
+    </linearGradient>
+    <linearGradient id="lg-cre" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DA9E5F"/><stop offset="1" stop-color="#B67839"/>
+    </linearGradient>
+    <linearGradient id="lg-mlk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3E5D1"/><stop offset="1" stop-color="#DEC8AB"/>
+    </linearGradient>
+    <linearGradient id="lg-fom" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FCF6EB"/><stop offset="1" stop-color="#EFE1C9"/>
+    </linearGradient>
+    <linearGradient id="lg-cho" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7D4728"/><stop offset="1" stop-color="#552F1A"/>
+    </linearGradient>
+    <linearGradient id="lg-whp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFBF2"/><stop offset="1" stop-color="#F1E6D1"/>
+    </linearGradient>
+    <linearGradient id="lg-wtr" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B98761"/><stop offset="1" stop-color="#8D633F"/>
+    </linearGradient>
+    <pattern id="pat-foam" width="11" height="9" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="3" r="1.15" fill="rgba(255,255,255,.55)"/>
+      <circle cx="8" cy="6.5" r=".85" fill="rgba(120,80,40,.07)"/>
+    </pattern>
+  </defs>
+</svg>
+
+<nav>
+  <span class="brand" id="brand">coffee types</span>
+  <div class="langs" id="langs">
+    <button data-lang="en">EN</button>
+    <button data-lang="pt">PT</button>
+    <button data-lang="de">DE</button>
+  </div>
+</nav>
+
+<header>
+  <p class="eyebrow" id="eyebrow"></p>
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+</header>
+
+<main class="grid" id="grid"></main>
+
+<footer id="footer"></footer>
+
+<script>
+/* ---------------- i18n ---------------- */
+const UI = {
+  en: {
+    docTitle: "Coffee, from the inside",
+    brand: "coffee types",
+    eyebrow: "a visual guide",
+    title: "Coffee, from the inside",
+    lead: "Hover over a cup to break it into its layers.",
+    footer: "Approximate proportions — every barista has their own.",
+  },
+  pt: {
+    docTitle: "Os cafés, por dentro",
+    brand: "tipos de café",
+    eyebrow: "guia visual",
+    title: "Os cafés, por dentro",
+    lead: "Passe o mouse sobre uma xícara para abrir as camadas.",
+    footer: "Proporções aproximadas — cada barista tem a sua.",
+  },
+  de: {
+    docTitle: "Kaffee, von innen",
+    brand: "kaffeesorten",
+    eyebrow: "ein visueller Leitfaden",
+    title: "Kaffee, von innen",
+    lead: "Fahre mit der Maus über eine Tasse, um die Schichten zu öffnen.",
+    footer: "Ungefähre Proportionen — jeder Barista hat seine eigenen.",
+  },
+};
+
+const ING = {
+  espresso:  { en: "espresso",      pt: "espresso",         de: "Espresso" },
+  crema:     { en: "crema",         pt: "crema",            de: "Crema" },
+  milk:      { en: "steamed milk",  pt: "leite vaporizado", de: "heiße Milch" },
+  foam:      { en: "milk foam",     pt: "espuma de leite",  de: "Milchschaum" },
+  microfoam: { en: "microfoam",     pt: "microespuma",      de: "Mikroschaum" },
+  chocolate: { en: "chocolate",     pt: "chocolate",        de: "Schokolade" },
+  whip:      { en: "whipped cream", pt: "chantilly",        de: "Schlagsahne" },
+  water:     { en: "hot water",     pt: "água quente",      de: "heißes Wasser" },
+};
+
+const QTY = {
+  top:  { en: "top",    pt: "topo", de: "oben" },
+  veil: { en: "a veil", pt: "véu",  de: "ein Hauch" },
+};
+
+const FILLS = {
+  espresso:  { g: "lg-esp" },
+  crema:     { g: "lg-cre" },
+  milk:      { g: "lg-mlk" },
+  foam:      { g: "lg-fom", pat: true },
+  microfoam: { g: "lg-fom", pat: true },
+  chocolate: { g: "lg-cho" },
+  whip:      { g: "lg-whp", pat: true },
+  water:     { g: "lg-wtr" },
+};
+
+/* ---------------- drinks ---------------- */
+const CAFES = [
+  {
+    id: "espresso", name: "Espresso", vessel: "demitasse", fill: 0.72,
+    sub: { en: "where it all starts", pt: "a base de tudo", de: "die Basis von allem" },
+    layers: [
+      { i: "espresso", f: 0.80, q: "30 ml" },
+      { i: "crema", f: 0.20, q: "top" },
+    ],
+  },
+  {
+    id: "macchiato", name: "Macchiato", vessel: "shotglass", fill: 0.55,
+    sub: { en: "a stained espresso", pt: "espresso manchado", de: "ein gefleckter Espresso" },
+    layers: [
+      { i: "espresso", f: 0.70, q: "2/3" },
+      { i: "foam", f: 0.30, q: "1/3" },
+    ],
+  },
+  {
+    id: "cortado", name: "Cortado", vessel: "gibraltar", fill: 0.62,
+    sub: { en: "half and half", pt: "meio a meio", de: "halb und halb" },
+    layers: [
+      { i: "espresso", f: 0.50, q: "1/2" },
+      { i: "milk", f: 0.50, q: "1/2" },
+    ],
+  },
+  {
+    id: "flatwhite", name: "Flat White", vessel: "tulip", fill: 0.85,
+    sub: { en: "velvet smooth", pt: "veludo australiano", de: "samtig glatt" },
+    layers: [
+      { i: "espresso", f: 0.34, q: "1/3" },
+      { i: "milk", f: 0.55, q: "2/3" },
+      { i: "microfoam", f: 0.11, q: "veil" },
+    ],
+  },
+  {
+    id: "cappuccino", name: "Cappuccino", vessel: "cappuccino", fill: 0.88,
+    sub: { en: "the italian trinity", pt: "a trindade italiana", de: "die italienische Dreifaltigkeit" },
+    layers: [
+      { i: "espresso", f: 1 / 3, q: "1/3" },
+      { i: "milk", f: 1 / 3, q: "1/3" },
+      { i: "foam", f: 1 / 3, q: "1/3" },
+    ],
+  },
+  {
+    id: "latte", name: "Latte", vessel: "latteglass", fill: 0.93,
+    sub: { en: "a milky embrace", pt: "abraço de leite", de: "eine milchige Umarmung" },
+    layers: [
+      { i: "espresso", f: 0.17, q: "1/6" },
+      { i: "milk", f: 0.66, q: "4/6" },
+      { i: "foam", f: 0.17, q: "1/6" },
+    ],
+  },
+  {
+    id: "mochaccino", name: "Mochaccino", vessel: "mochaglass", fill: 0.90,
+    sub: { en: "coffee meets chocolate", pt: "café com chocolate", de: "Kaffee trifft Schokolade" },
+    layers: [
+      { i: "chocolate", f: 0.25, q: "1/4" },
+      { i: "espresso", f: 0.25, q: "1/4" },
+      { i: "milk", f: 0.40, q: "2/4" },
+      { i: "whip", f: 0.10, q: "top" },
+    ],
+  },
+  {
+    id: "americano", name: "Americano", vessel: "mug", fill: 0.82,
+    sub: { en: "long and mellow", pt: "alongado e suave", de: "lang und mild" },
+    layers: [
+      { i: "espresso", f: 1 / 3, q: "1/3" },
+      { i: "water", f: 2 / 3, q: "2/3" },
+    ],
+  },
+];
+
+/* ---------------- vessels (hand-drawn) ----------------
+   Each vessel: outline strokes, interior clip path, liquid
+   y-range (iTop..iBot), rim y for steam, shadow, label x. */
+const VESSELS = {
+  demitasse: {
+    strokes: [
+      { d: "M106 196 L194 196 L183 252 Q181 262 170 262 L130 262 Q119 262 117 252 Z", w: 3 },
+      { d: "M194 210 C218 207 220 236 190 240", w: 6.5 },
+      { d: "M84 270 Q150 290 216 270", w: 3 },
+    ],
+    interior: "M112 201 L188 201 L178 249 Q176 257 168 257 L132 257 Q124 257 122 249 Z",
+    iTop: 201, iBot: 257, rim: 196,
+    shadow: { cy: 286, rx: 72, ry: 6 },
+    labelX: 228,
+  },
+  shotglass: {
+    strokes: [
+      { d: "M113 180 L187 180 L179 258 Q178 266 168 266 L132 266 Q122 266 121 258 Z", w: 3 },
+      { d: "M126 257 L174 257", w: 1.4 },
+    ],
+    interior: "M119 186 L181 186 L174 250 Q173 256 166 256 L134 256 Q127 256 126 250 Z",
+    iTop: 186, iBot: 256, rim: 180,
+    shadow: { cy: 274, rx: 46, ry: 5 },
+    labelX: 200,
+  },
+  gibraltar: {
+    strokes: [
+      { d: "M107 168 L193 168 L188 260 Q188 268 178 268 L122 268 Q112 268 112 260 Z", w: 3 },
+      { d: "M119 258 L181 258", w: 1.4 },
+      { d: "M117 180 C116 210 117 236 119 248", w: 1.2 },
+    ],
+    interior: "M114 175 L186 175 L182 252 Q182 258 174 258 L126 258 Q118 258 118 252 Z",
+    iTop: 175, iBot: 258, rim: 168,
+    shadow: { cy: 276, rx: 52, ry: 5.5 },
+    labelX: 206,
+  },
+  tulip: {
+    strokes: [
+      { d: "M100 176 L200 176 C198 214 190 240 177 255 Q172 264 162 264 L138 264 Q128 264 123 255 C110 240 102 214 100 176 Z", w: 3 },
+      { d: "M198 198 C224 197 224 232 191 234", w: 6.5 },
+      { d: "M82 272 Q150 292 218 272", w: 3 },
+    ],
+    interior: "M107 182 L193 182 C191 214 184 237 172 251 Q168 258 160 258 L140 258 Q132 258 128 251 C116 237 109 214 107 182 Z",
+    iTop: 182, iBot: 258, rim: 176,
+    shadow: { cy: 288, rx: 76, ry: 6 },
+    labelX: 232,
+  },
+  cappuccino: {
+    strokes: [
+      { d: "M96 170 L204 170 C206 208 196 238 178 254 Q173 262 163 262 L137 262 Q127 262 122 254 C104 238 94 208 96 170 Z", w: 3 },
+      { d: "M203 188 C230 188 230 226 195 228", w: 6.5 },
+      { d: "M78 270 Q150 292 222 270", w: 3 },
+    ],
+    interior: "M103 176 L197 176 C198 208 189 234 173 249 Q169 256 161 256 L139 256 Q131 256 127 249 C111 234 102 208 103 176 Z",
+    iTop: 176, iBot: 256, rim: 170,
+    shadow: { cy: 288, rx: 80, ry: 6 },
+    labelX: 238,
+  },
+  latteglass: {
+    strokes: [
+      { d: "M109 96 L191 96 C193 150 189 210 184 240 Q182 258 165 258 L135 258 Q118 258 116 240 C111 210 107 150 109 96 Z", w: 3 },
+      { d: "M145 258 L140 274 M155 258 L160 274", w: 2.5 },
+      { d: "M128 275 L172 275", w: 3 },
+      { d: "M116 110 C114 150 115 200 118 228", w: 1.2 },
+    ],
+    interior: "M115 102 L185 102 C187 150 183 208 178 237 Q176 252 162 252 L138 252 Q124 252 122 237 C117 208 113 150 115 102 Z",
+    iTop: 102, iBot: 252, rim: 96,
+    shadow: { cy: 282, rx: 46, ry: 5 },
+    labelX: 204,
+  },
+  mochaglass: {
+    strokes: [
+      { d: "M102 140 L198 140 C196 178 184 214 166 228 Q162 232 150 232 Q138 232 134 228 C116 214 104 178 102 140 Z", w: 3 },
+      { d: "M150 232 L150 258", w: 7 },
+      { d: "M122 262 Q150 254 178 262 Q150 272 122 262 Z", w: 2.5 },
+      { d: "M110 152 C112 178 120 202 132 216", w: 1.2 },
+    ],
+    interior: "M109 146 L191 146 C189 180 178 210 161 223 Q157 227 150 227 Q143 227 139 223 C122 210 111 180 109 146 Z",
+    iTop: 146, iBot: 227, rim: 140,
+    shadow: { cy: 272, rx: 44, ry: 5 },
+    labelX: 210,
+  },
+  mug: {
+    strokes: [
+      { d: "M104 150 L196 150 L196 258 Q196 268 186 268 L114 268 Q104 268 104 258 Z", w: 3 },
+      { d: "M197 176 C232 174 232 236 195 234", w: 8 },
+    ],
+    interior: "M110 156 L190 156 L190 254 Q190 262 182 262 L118 262 Q110 262 110 254 Z",
+    iTop: 156, iBot: 262, rim: 150,
+    shadow: { cy: 276, rx: 62, ry: 5.5 },
+    labelX: 240,
+  },
+};
+
+/* ---------------- render ---------------- */
+const $ = (id) => document.getElementById(id);
+const grid = $("grid");
+let lang = localStorage.getItem("coffee-lang") || "en";
+if (!UI[lang]) lang = "en";
+
+function steamSVG(rim) {
+  const y = rim - 8;
+  return `<g class="steam">
+    <path d="M141 ${y} C136 ${y - 11} 146 ${y - 19} 141 ${y - 31}"/>
+    <path d="M159 ${y + 2} C154 ${y - 9} 164 ${y - 17} 159 ${y - 29}"/>
+    <path d="M150 ${y - 4} C146 ${y - 14} 154 ${y - 22} 150 ${y - 34}"/>
+  </g>`;
+}
+
+function cupSVG(c) {
+  const v = VESSELS[c.vessel];
+  const ih = v.iBot - v.iTop;
+  const liquidH = c.fill * ih;
+  let cursor = v.iBot;
+  const slices = c.layers.map((L, k) => {
+    const h = L.f * liquidH;
+    const y = cursor - h;
+    cursor = y;
+    const fill = FILLS[L.i];
+    const qty = typeof QTY[L.q] === "object" ? QTY[L.q][lang] : L.q;
+    const yc = y + h / 2;
+    const pat = fill.pat
+      ? `<rect x="88" y="${y.toFixed(1)}" width="124" height="${(h + 0.6).toFixed(1)}" fill="url(#pat-foam)"/>`
+      : "";
+    return `<g class="layer" style="--k:${k}">
+      <g clip-path="url(#int-${c.id})">
+        <rect x="88" y="${y.toFixed(1)}" width="124" height="${(h + 0.6).toFixed(1)}" fill="url(#${fill.g})"/>
+        ${pat}
+      </g>
+      <g class="lbl" style="--k:${k}">
+        <line x1="${v.labelX}" y1="${yc.toFixed(1)}" x2="${v.labelX + 13}" y2="${yc.toFixed(1)}" pathLength="1"/>
+        <text x="${v.labelX + 18}" y="${(yc + 3.5).toFixed(1)}">${ING[L.i][lang]} · ${qty}</text>
+      </g>
+    </g>`;
+  }).join("");
+
+  const strokes = v.strokes
+    .map((s) => `<path d="${s.d}" stroke-width="${s.w}"/>`)
+    .join("");
+
+  return `<svg viewBox="0 0 360 340" role="img" aria-label="${c.name}">
+    <defs><clipPath id="int-${c.id}"><path d="${v.interior}"/></clipPath></defs>
+    <ellipse class="shadow" cx="150" cy="${v.shadow.cy}" rx="${v.shadow.rx}" ry="${v.shadow.ry}"/>
+    ${steamSVG(v.rim)}
+    ${slices}
+    <g class="vessel">${strokes}</g>
+  </svg>`;
+}
+
+function attachTilt(card) {
+  const tiltEl = card.querySelector(".tilt");
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf = null, hovering = false;
+  const step = () => {
+    cx += (tx - cx) * 0.12;
+    cy += (ty - cy) * 0.12;
+    tiltEl.style.transform = `perspective(950px) rotateX(${cy.toFixed(2)}deg) rotateY(${cx.toFixed(2)}deg)`;
+    if (hovering || Math.abs(tx - cx) > 0.02 || Math.abs(ty - cy) > 0.02) {
+      raf = requestAnimationFrame(step);
+    } else {
+      raf = null;
+      tiltEl.style.transform = "";
+    }
+  };
+  card.addEventListener("pointermove", (e) => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    tx = (px - 0.5) * 9;
+    ty = -(py - 0.5) * 7;
+    hovering = true;
+    card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+    card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    if (!raf) raf = requestAnimationFrame(step);
+  });
+  card.addEventListener("pointerleave", () => {
+    hovering = false;
+    tx = 0; ty = 0;
+    if (!raf) raf = requestAnimationFrame(step);
+  });
+}
+
+function render() {
+  const t = UI[lang];
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
+  document.title = t.docTitle;
+  $("brand").textContent = t.brand;
+  $("eyebrow").textContent = t.eyebrow;
+  $("title").textContent = t.title;
+  $("lead").textContent = t.lead;
+  $("footer").textContent = t.footer;
+
+  grid.innerHTML = "";
+  CAFES.forEach((c, i) => {
+    const card = document.createElement("article");
+    card.className = "card";
+    card.style.setProperty("--i", i);
+    card.innerHTML =
+      `<div class="tilt">${cupSVG(c)}</div>` +
+      `<h2>${c.name}</h2><p class="sub">${c.sub[lang]}</p>`;
+    grid.appendChild(card);
+    attachTilt(card);
+  });
+
+  document.querySelectorAll(".langs button").forEach((b) => {
+    b.classList.toggle("on", b.dataset.lang === lang);
+  });
+}
+
+$("langs").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b || b.dataset.lang === lang) return;
+  lang = b.dataset.lang;
+  localStorage.setItem("coffee-lang", lang);
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
