@@ -497,6 +497,11 @@
     <linearGradient id="lg-nhd" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#E5CBA2"/><stop offset="1" stop-color="#C6A375"/>
     </linearGradient>
+    <linearGradient id="lg-cube" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".8"/>
+      <stop offset=".55" stop-color="#EDF3F7" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#D9E6EE" stop-opacity=".18"/>
+    </linearGradient>
     <linearGradient id="lg-cyl" gradientUnits="userSpaceOnUse" x1="130" y1="0" x2="350" y2="0">
       <stop offset="0" stop-color="#3F2312" stop-opacity=".20"/>
       <stop offset=".26" stop-color="#FFFFFF" stop-opacity=".16"/>
@@ -1077,34 +1082,44 @@ function garnish(id, rx) {
 }
 
 /* toppers (unsquashed, sit on the top slice) */
-function whipDome(surfRx, scale, fill, tex, swirlColor) {
+function whipDome(surfRx, scale, fill, edge, tex) {
   const R = surfRx * scale;
-  const dome = `M${-R} 2 Q${-R*1.02} -24 ${-R*.52} -30 Q${-R*.4} -42 ${-R*.05} -38
-      Q${R*.18} -50 ${R*.42} -36 Q${R*.98} -30 ${R} 2 Z`;
-  return `<path d="${dome}" fill="${fill}"/>
-    <path d="${dome}" fill="#fff" filter="url(#${tex})" opacity=".45"/>
-    <path d="${dome}" fill="none" stroke="#4A2E1B" stroke-width="2" opacity=".35"/>
-    <path d="M${-R*.6} -12 Q${-R*.15} -26 ${R*.25} -16" fill="none" stroke="${swirlColor}" stroke-width="2.4" opacity=".6"/>
-    <path d="M${R*.02} -38 Q${R*.14} -48 ${-R*.06} -54" fill="none" stroke="${swirlColor}" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>
-    <ellipse cx="${-R*.3}" cy="-24" rx="${R*.24}" ry="7" fill="#FFFFFF" opacity=".5"/>`;
+  const t1 = `M${-R} 3 Q${-R*1.05} -13 ${-R*.6} -17 Q0 -27 ${R*.6} -17 Q${R*1.05} -13 ${R} 3 Z`;
+  const t2 = `M${-R*.68} -11 Q${-R*.74} -28 ${-R*.3} -32 Q0 -38 ${R*.32} -31 Q${R*.72} -26 ${R*.62} -11 Q0 -21 ${-R*.68} -11 Z`;
+  const t3 = `M${-R*.26} -26 Q${-R*.3} -42 ${-R*.02} -46 Q${R*.2} -48 ${R*.15} -37 Q${R*.3} -38 ${R*.22} -27 Q0 -34 ${-R*.26} -26 Z`;
+  return `
+    <path d="${t1}" fill="${fill}" stroke="${edge}" stroke-width="1.2" stroke-opacity=".45"/>
+    <path d="${t2}" fill="${fill}" stroke="${edge}" stroke-width="1.1" stroke-opacity=".4"/>
+    <path d="${t3}" fill="${fill}" stroke="${edge}" stroke-width="1" stroke-opacity=".4"/>
+    <path d="${t1}" fill="#fff" filter="url(#${tex})" opacity=".35"/>
+    <path d="M${-R*.02} -46 Q${-R*.12} -55 ${-R*.28} -51" fill="none" stroke="${edge}" stroke-width="2.4" stroke-linecap="round" opacity=".75"/>
+    <ellipse cx="${-R*.36}" cy="-19" rx="${R*.2}" ry="5.5" fill="#FFFFFF" opacity=".5"/>
+    <ellipse cx="${-R*.12}" cy="-37" rx="${R*.11}" ry="4" fill="#FFFFFF" opacity=".55"/>`;
 }
 
 function topper(id, y, surfRx) {
   if (id === "dalgona") {
-    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .52, "#E4AA5C", "f-crema", "#B37B33")}</g>`;
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .52, "url(#lg-dal)", "#A97731", "f-crema")}</g>`;
   }
   if (id === "einspaenner") {
-    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .55, "#FFFDF6", "f-foam", "#E3D0AC")}</g>`;
+    return `<g transform="translate(${CX} ${y.toFixed(1)})">${whipDome(surfRx, .55, "url(#lg-whp)", "#CDB88F", "f-foam")}</g>`;
   }
   if (id === "icedlatte" || id === "espressotonic") {
-    const cube = (tx, ty2, rot, s) =>
-      `<g transform="translate(${tx} ${ty2}) rotate(${rot})">
-        <rect x="${-s}" y="${-s}" width="${s*2}" height="${s*2}" rx="${s*.36}"
-          fill="rgba(255,255,255,.38)" stroke="rgba(255,255,255,.9)" stroke-width="2"/>
-        <path d="M${-s*.4} ${-s*.35} L${s*.3} ${-s*.6}" stroke="rgba(255,255,255,.85)" stroke-width="1.5" fill="none"/>
+    const cube = (tx, ty2, rot, s, op) =>
+      `<g transform="translate(${tx} ${ty2}) rotate(${rot})" opacity="${op}">
+        <rect x="${-s}" y="${-s}" width="${s*2}" height="${s*2}" rx="${(s*.3).toFixed(1)}"
+          fill="url(#lg-cube)" stroke="rgba(255,255,255,.85)" stroke-width="1.5"/>
+        <path d="M${-s*.5} ${s*.45} L${s*.45} ${-s*.5}" stroke="rgba(255,255,255,.55)"
+          stroke-width="${(s*.3).toFixed(1)}" stroke-linecap="round"/>
+        <path d="M${-s*.62} ${-s*.62} L${-s*.05} ${-s*.62}" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" opacity=".95"/>
+        <path d="M${-s+1.5} ${s-2.5} Q0 ${s+1.5} ${s-1.5} ${s-2.5}" stroke="rgba(110,75,40,.16)" stroke-width="1.6" fill="none"/>
       </g>`;
+    const sparkle = (sx, sy) =>
+      `<path d="M${sx} ${sy-3.4} L${sx} ${sy+3.4} M${sx-3.4} ${sy} L${sx+3.4} ${sy}"
+        stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".85"/>`;
     return `<g transform="translate(${CX} ${y.toFixed(1)})">
-      ${cube(-26, -7, -14, 13)}${cube(20, -4, 10, 11)}${cube(-2, 4, 24, 9)}
+      ${cube(-25, -9, -12, 13.5, 1)}${cube(21, -5, 9, 11, .95)}${cube(-3, 6, 26, 8.5, .8)}
+      ${sparkle(-38, -20)}${sparkle(33, -16)}
     </g>`;
   }
   if (id === "affogato") {
