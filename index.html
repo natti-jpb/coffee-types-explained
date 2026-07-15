@@ -106,7 +106,7 @@
     from { opacity: 0; transform: translateY(26px); }
     to { opacity: 1; transform: none; }
   }
-  .grid:hover .card:not(:hover) {
+  .grid:has(.card:hover) .card:not(:hover) {
     opacity: .4;
     filter: blur(1.6px) saturate(.8);
     transform: scale(.97);
@@ -181,6 +181,28 @@
     outline: 1px solid rgba(62, 36, 21, .13);
   }
   .ratio i { display: block; height: 100%; }
+
+  /* trait icons: temperature · intensity · sweetness */
+  .traits {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    margin-top: 12px;
+  }
+  .tchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4.5px;
+    font: 600 9.5px Inter, sans-serif;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #A5764C;
+  }
+  .tchip i { font-style: normal; }
+  .tchip svg { width: 11px; height: 13px; display: block; color: #8a5f3d; }
+  .tchip svg.off { opacity: .22; }
+  .tsep { color: rgba(138, 106, 79, .4); font-size: 10px; }
 
   /* ---- vessel ---- */
   .vessel { transition: opacity .55s ease; }
@@ -968,6 +990,40 @@ function ratioHTML(c) {
   }).join("") + `</div>`;
 }
 
+/* ================= traits (temperature · intensity · sweetness) ================= */
+const TRAITS = {
+  espresso: [3, 0], macchiato: [3, 0], cortado: [2, 0], bombon: [2, 3],
+  flatwhite: [2, 0], cappuccino: [2, 0], latte: [1, 1], mochaccino: [2, 2],
+  einspaenner: [3, 1], americano: [2, 0], irish: [2, 2], affogato: [2, 3],
+  icedlatte: [1, 1], dalgona: [2, 3], espressotonic: [2, 1], nitro: [3, 0],
+};
+const TLBL = {
+  hot:  { en: "hot",       pt: "quente",      de: "heiß" },
+  cold: { en: "iced",      pt: "gelado",      de: "eiskalt" },
+  int:  { en: "intensity", pt: "intensidade", de: "Intensität" },
+  swt:  { en: "sweetness", pt: "doçura",      de: "Süße" },
+};
+const IC = {
+  hot: '<svg viewBox="0 0 12 14"><path d="M4 12.5 C2.4 10.2 5.1 8.9 3.7 6.3 M8.2 12.5 C6.6 10.2 9.3 8.9 7.9 6.3" stroke="currentColor" fill="none" stroke-width="1.7" stroke-linecap="round"/></svg>',
+  cold: '<svg viewBox="0 0 12 14"><path d="M6 1.5 V12.5 M2 4 L10 10 M10 4 L2 10" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  bean: (on) => `<svg viewBox="0 0 12 14" class="${on ? "" : "off"}"><ellipse cx="6" cy="7" rx="4.3" ry="5.6" transform="rotate(18 6 7)" fill="currentColor"/><path d="M4 2.6 C7.4 5.2 4.6 9 7.9 11.6" stroke="#FBF4E7" stroke-width="1.4" fill="none"/></svg>`,
+  sugar: (on) => `<svg viewBox="0 0 12 14" class="${on ? "" : "off"}"><rect x="1.5" y="2.5" width="9" height="9" rx="2.2" fill="currentColor"/></svg>`,
+};
+
+function traitsHTML(c) {
+  const [str, swt] = TRAITS[c.id] || [2, 0];
+  const cold = !!c.noSteam;
+  const beans = [0, 1, 2].map((j) => IC.bean(j < str)).join("");
+  const sugars = [0, 1, 2].map((j) => IC.sugar(j < swt)).join("");
+  return `<div class="traits">
+    <span class="tchip">${cold ? IC.cold : IC.hot}<i>${TLBL[cold ? "cold" : "hot"][lang]}</i></span>
+    <span class="tsep">·</span>
+    <span class="tchip" title="${TLBL.int[lang]} ${str}/3">${beans}</span>
+    <span class="tsep">·</span>
+    <span class="tchip" title="${TLBL.swt[lang]} ${swt}/3">${sugars}</span>
+  </div>`;
+}
+
 /* ================= tilt & spotlight ================= */
 function attachTilt(card) {
   const tiltEl = card.querySelector(".cupbox svg");
@@ -1026,7 +1082,7 @@ function render() {
     card.innerHTML =
       `<div class="cupbox">${cupSVG(c)}${labelsHTML(c)}</div>` +
       `<h2>${c.name}</h2><p class="sub">${c.sub[lang]}</p>` +
-      ratioHTML(c);
+      ratioHTML(c) + traitsHTML(c);
     grid.appendChild(card);
     attachTilt(card);
   });
